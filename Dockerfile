@@ -35,6 +35,7 @@ RUN apt-get update \
         pdo_sqlite \
         xml \
         zip \
+        bcmath \
     && a2enmod expires headers rewrite \
     && rm -rf /var/lib/apt/lists/*
 
@@ -70,7 +71,8 @@ COPY . ./
 COPY --from=backend /var/www/html/webtrees/vendor ./vendor
 COPY --from=frontend /src/public ./public
 
-RUN mkdir -p data \
+RUN php index.php compile-po-files \
+    && mkdir -p data \
     && chown -R www-data:www-data data
 
 VOLUME ["/var/www/html/webtrees/data"]
