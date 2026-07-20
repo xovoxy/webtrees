@@ -1,0 +1,15 @@
+.git
+.github
+.idea
+.vscode
+.env
+node_modules
+vendor
+tests
+*.log
+.DS_Store
+
+data/*
+!data/.htaccess
+!data/.gitignore
+!data/index.php

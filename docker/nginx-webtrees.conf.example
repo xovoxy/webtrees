@@ -1,0 +1,54 @@
+# If Nginx runs on the Docker host, keep this address.
+# If Nginx is another container on the same network, use: server webtrees:80;
+upstream webtrees_backend {
+    server 127.0.0.1:8080;
+    keepalive 16;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name example.com;
+
+    # Replace these with the certificate paths used by your server.
+    ssl_certificate /etc/nginx/ssl/example.com/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/example.com/privkey.pem;
+
+    client_max_body_size 256m;
+
+    location = /webtrees {
+        return 301 /webtrees/;
+    }
+
+    # Static assets are versioned by webtrees and can be cached for a long time.
+    location ^~ /webtrees/public/ {
+        proxy_pass http://webtrees_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+
+        expires 365d;
+        access_log off;
+    }
+
+    location /webtrees/ {
+        # No trailing slash: the /webtrees prefix must reach Apache unchanged.
+        proxy_pass http://webtrees_backend;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+
+        proxy_connect_timeout 30s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+    }
+}
+
