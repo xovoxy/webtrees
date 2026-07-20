@@ -22,6 +22,13 @@
     position: relative;
     top: 0;
     left: 0;
+    min-width: 42rem;
+    color: var(--wt-archive-ink, #24312c);
+    background:
+        linear-gradient(rgb(40 90 79 / 3%) 1px, transparent 1px),
+        var(--wt-archive-surface, #fffdfa);
+    background-size: 100% 2rem;
+    border-radius: 0.85rem;
 }
 
 .wt-timeline-overlay {
@@ -32,7 +39,7 @@
 }
 
 .wt-timeline-axis {
-    border-inline-start: 3px solid var(--bs-border-color);
+    border-inline-start: 3px solid rgb(40 90 79 / 35%);
     inset-block: 0;
     position: absolute;
     z-index: 0;
@@ -85,7 +92,12 @@
 .wt-timeline-age-content {
     display: inline-flex;
     gap: 0.35rem;
-    padding: 0 0.2rem;
+    padding: 0.28rem 0.55rem;
+    color: var(--wt-archive-ink, #24312c);
+    border: 1px solid rgb(36 49 44 / 10%);
+    border-radius: 999px;
+    box-shadow: 0 2px 7px rgb(36 49 44 / 8%);
+    backdrop-filter: blur(6px);
 }
 
 .wt-timeline-age-content {
@@ -114,37 +126,79 @@
 
 .person0, .person1, .person2, .person3,
 .person4, .person5, .person6, .person7 {
-    --person-bg-alpha: 30%;
+    --person-bg-alpha: 22%;
+}
+
+.wt-timeline-people {
+    max-width: 88rem;
+    margin-inline: auto;
+    gap: 0.55rem 0;
+}
+
+.wt-timeline-people > [class*="person"] {
+    padding: 0.7rem 0.8rem;
+    color: var(--wt-archive-ink, #24312c);
+    border: 1px solid rgb(36 49 44 / 9%);
+    border-radius: 0.7rem;
+    font-size: 0.8rem;
+}
+
+.wt-timeline-people > [class*="person"] > a:first-of-type {
+    font-family: "Iowan Old Style", "Noto Serif SC", Georgia, serif;
+    font-weight: 750;
+}
+
+.wt-page-options-timeline-chart a[title] {
+    display: inline-grid;
+    width: 2.4rem;
+    height: 2.4rem;
+    color: var(--wt-archive-pine, #285a4f);
+    background: rgb(40 90 79 / 8%);
+    border: 1px solid rgb(40 90 79 / 15%);
+    border-radius: 50%;
+    place-items: center;
+}
+
+@media (max-width: 48rem) {
+    #timeline_chart {
+        min-width: 34rem;
+    }
+
+    .wt-timeline-fact-content,
+    .wt-timeline-age-content {
+        max-width: 18rem;
+        white-space: normal;
+    }
 }
 
 .person0 {
-    background-color: color-mix(in srgb, var(--bs-red) var(--person-bg-alpha), transparent);
+    background-color: color-mix(in srgb, #ad6842 var(--person-bg-alpha), transparent);
 }
 
 .person1 {
-    background-color: color-mix(in srgb, var(--bs-orange) var(--person-bg-alpha), transparent);
+    background-color: color-mix(in srgb, #557f88 var(--person-bg-alpha), transparent);
 }
 
 .person2 {
-    background-color: color-mix(in srgb, var(--bs-yellow) var(--person-bg-alpha), transparent);
+    background-color: color-mix(in srgb, #9a6076 var(--person-bg-alpha), transparent);
 }
 
 .person3 {
-    background-color: color-mix(in srgb, var(--bs-green) var(--person-bg-alpha), transparent);
+    background-color: color-mix(in srgb, #68806b var(--person-bg-alpha), transparent);
 }
 
 .person4 {
-    background-color: color-mix(in srgb, var(--bs-teal) var(--person-bg-alpha), transparent);
+    background-color: color-mix(in srgb, #8a8752 var(--person-bg-alpha), transparent);
 }
 
 .person5 {
-    background-color: color-mix(in srgb, var(--bs-cyan) var(--person-bg-alpha), transparent);
+    background-color: color-mix(in srgb, #526b79 var(--person-bg-alpha), transparent);
 }
 
 .person6 {
-    background-color: color-mix(in srgb, var(--bs-purple) var(--person-bg-alpha), transparent);
+    background-color: color-mix(in srgb, #776b86 var(--person-bg-alpha), transparent);
 }
 
 .person7 {
-    background-color: color-mix(in srgb, var(--bs-pink) var(--person-bg-alpha), transparent);
+    background-color: color-mix(in srgb, #795148 var(--person-bg-alpha), transparent);
 }

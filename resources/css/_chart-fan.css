@@ -18,3 +18,29 @@
  *
  * wt-chart, wt-chart-fan
  */
+.wt-chart-fan {
+    min-height: 24rem;
+}
+
+.wt-chart-fan-img {
+    max-width: none;
+    padding: clamp(0.5rem, 1.5vw, 1rem);
+    background: rgb(255 253 250 / 84%);
+    border: 1px solid rgb(217 211 198 / 76%);
+    border-radius: 50% 50% 1.25rem 1.25rem;
+    box-shadow: 0 20px 48px rgb(36 49 44 / 12%);
+}
+
+.wt-chart-fan .fan_chart_menu {
+    padding: 0.65rem;
+    background: var(--wt-archive-surface, #fffdfa);
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 0.75rem;
+    box-shadow: var(--wt-archive-shadow, 0 16px 40px rgb(36 49 44 / 14%));
+}
+
+@media (max-width: 48rem) {
+    .wt-chart-fan {
+        min-height: 18rem;
+    }
+}

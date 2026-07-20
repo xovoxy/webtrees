@@ -13,11 +13,9 @@ use Fisharebest\Webtrees\Individual;
 
 ?>
 
-<h2 class="wt-page-title">
-    <?= $title ?>
-</h2>
+<?= view('modules/charts/page-heading', ['title' => $title]) ?>
 
-<form method="post" class="wt-page-options wt-page-options-compact-chart d-print-none">
+<form method="post" class="wt-page-options wt-chart-options-panel wt-page-options-interactive-tree d-print-none">
     <div class="row">
         <label class="col-sm-3 col-form-label wt-page-options-label" for="xref">
             <?= I18N::translate('Individual') ?>
@@ -38,7 +36,6 @@ use Fisharebest\Webtrees\Individual;
     <?= csrf_field() ?>
 </form>
 
-<div class="wt-page-content wt-chart wt-chart-interactive">
+<div class="wt-page-content wt-chart wt-chart-archive-canvas wt-chart-interactive" role="region" tabindex="0" aria-label="<?= e(strip_tags($title)) ?>">
     <?= $html ?>
 </div>
-

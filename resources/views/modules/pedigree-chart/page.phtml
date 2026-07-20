@@ -20,49 +20,62 @@ use Fisharebest\Webtrees\Tree;
 
 ?>
 
-<h2 class="wt-page-title">
-    <?= $title ?>
-</h2>
+<header class="wt-chart-page-heading wt-pedigree-page-heading">
+    <div class="wt-chart-page-kicker">
+        <span aria-hidden="true"></span>
+        <?= I18N::translate('Pedigree') ?>
+    </div>
+    <h2 class="wt-page-title">
+        <?= $title ?>
+    </h2>
+</header>
 
 <form method="post" class="wt-page-options wt-page-options-pedigree-chart d-print-none">
-    <div class="row">
-        <label class="col-sm-3 col-form-label wt-page-options-label" for="xref">
-            <?= I18N::translate('Individual') ?>
-        </label>
-        <div class="col-sm-9 wt-page-options-value">
-            <?= view('components/select-individual', ['name' => 'xref', 'individual' => $individual, 'tree' => $tree]) ?>
+    <div class="wt-pedigree-control-grid">
+        <div class="wt-pedigree-control-field wt-pedigree-control-person">
+            <label class="col-form-label wt-page-options-label" for="xref">
+                <span class="wt-pedigree-field-index" aria-hidden="true">01</span>
+                <span><?= I18N::translate('Individual') ?></span>
+            </label>
+            <div class="wt-page-options-value">
+                <?= view('components/select-individual', ['name' => 'xref', 'individual' => $individual, 'tree' => $tree]) ?>
+            </div>
         </div>
-    </div>
 
-    <div class="row">
-        <label class="col-sm-3 col-form-label wt-page-options-label" for="generations">
-            <?= I18N::translate('Generations') ?>
-        </label>
-        <div class="col-sm-9 wt-page-options-value">
-            <?= view('components/select-number', ['name' => 'generations', 'selected' => $generations, 'options' => range($min_generations, $max_generations)]) ?>
+        <div class="wt-pedigree-control-field wt-pedigree-control-generations">
+            <label class="col-form-label wt-page-options-label" for="generations">
+                <span class="wt-pedigree-field-index" aria-hidden="true">02</span>
+                <span><?= I18N::translate('Generations') ?></span>
+            </label>
+            <div class="wt-page-options-value">
+                <?= view('components/select-number', ['name' => 'generations', 'selected' => $generations, 'options' => range($min_generations, $max_generations)]) ?>
+            </div>
         </div>
-    </div>
 
-    <div class="row">
-        <label class="col-sm-3 col-form-label wt-page-options-label" for="style">
-            <?= I18N::translate('Layout') ?>
-        </label>
-        <div class="col-sm-9 wt-page-options-value">
-            <?= view('components/radios-inline', ['name' => 'style', 'options' => $styles, 'selected' => $style]) ?>
-        </div>
-    </div>
+        <fieldset class="wt-pedigree-control-field wt-pedigree-control-layout">
+            <legend class="col-form-label wt-page-options-label">
+                <span class="wt-pedigree-field-index" aria-hidden="true">03</span>
+                <span><?= I18N::translate('Layout') ?></span>
+            </legend>
+            <div class="wt-page-options-value wt-pedigree-layout-options">
+                <?= view('components/radios-inline', ['name' => 'style', 'options' => $styles, 'selected' => $style]) ?>
+            </div>
+        </fieldset>
 
-    <div class="row mb-3">
-        <div class="col-sm-3 wt-page-options-label"></div>
-        <div class="col-sm-9 wt-page-options-value">
-            <input class="btn btn-primary" type="submit" value="<?= /* I18N: A button label. */
-            I18N::translate('view') ?>">
+        <div class="wt-pedigree-control-action">
+            <button class="btn btn-primary wt-pedigree-submit" type="submit">
+                <span><?= /* I18N: A button label. */ I18N::translate('view') ?></span>
+                <span aria-hidden="true">→</span>
+            </button>
         </div>
     </div>
 
     <?= csrf_field() ?>
 </form>
 
-<div class="wt-page-content wt-chart wt-chart-pedigree" data-wt-ajax-url="<?= e($ajax_url) ?>">
-    <?= view('icons/spinner') ?>
+<div class="wt-page-content wt-chart wt-chart-pedigree" data-wt-ajax-url="<?= e($ajax_url) ?>" aria-live="polite">
+    <div class="wt-chart-loading wt-pedigree-loading">
+        <?= view('icons/spinner') ?>
+        <span><?= I18N::translate('Pedigree') ?></span>
+    </div>
 </div>

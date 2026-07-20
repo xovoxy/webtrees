@@ -19,18 +19,18 @@
  * wt-chart, wt-chart-pedigree-map
  */
 :root {
-    --wt-pedigree-map-gen-0: red;
-    --wt-pedigree-map-gen-1: orange;
-    --wt-pedigree-map-gen-2: gold;
-    --wt-pedigree-map-gen-3: lightgreen;
-    --wt-pedigree-map-gen-4: green;
-    --wt-pedigree-map-gen-5: limegreen;
-    --wt-pedigree-map-gen-6: cyan;
-    --wt-pedigree-map-gen-7: blue;
-    --wt-pedigree-map-gen-8: cornflowerblue;
-    --wt-pedigree-map-gen-9: pink;
-    --wt-pedigree-map-gen-10: magenta;
-    --wt-pedigree-map-gen-11: maroon;
+    --wt-pedigree-map-gen-0: #8d4f30;
+    --wt-pedigree-map-gen-1: #ad6842;
+    --wt-pedigree-map-gen-2: #b7834f;
+    --wt-pedigree-map-gen-3: #8a8752;
+    --wt-pedigree-map-gen-4: #68806b;
+    --wt-pedigree-map-gen-5: #3f7164;
+    --wt-pedigree-map-gen-6: #285a4f;
+    --wt-pedigree-map-gen-7: #557f88;
+    --wt-pedigree-map-gen-8: #526b79;
+    --wt-pedigree-map-gen-9: #776b86;
+    --wt-pedigree-map-gen-10: #8b6075;
+    --wt-pedigree-map-gen-11: #795148;
 }
 
 .wt-pedigree-map-gen-0 {
@@ -79,4 +79,48 @@
 
 .wt-pedigree-map-gen-11 {
     color: var(--wt-pedigree-map-gen-11);
+}
+
+.wt-chart-map-panel {
+    overflow: hidden;
+}
+
+.wt-pedigree-map-wrapper {
+    min-height: 34rem;
+    margin: 0 !important;
+    overflow: hidden;
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 1rem;
+}
+
+.wt-pedigree-map-wrapper .wt-map {
+    min-height: 34rem;
+}
+
+.wt-pedigree-map-wrapper .wt-map-sidebar {
+    padding: 0.85rem !important;
+    overflow: auto;
+    background: var(--wt-archive-surface, #fffdfa);
+    border-inline-start: 1px solid var(--wt-archive-border, #d9d3c6);
+}
+
+.wt-pedigree-map-wrapper .wt-map-sidebar li {
+    margin-bottom: 0.45rem;
+    padding: 0.55rem 0.65rem;
+    background: var(--wt-archive-surface-muted, #eeebe2);
+    border-radius: 0.6rem;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 36rem) {
+    .wt-pedigree-map-wrapper,
+    .wt-pedigree-map-wrapper .wt-map {
+        min-height: 27rem;
+    }
+
+    .wt-pedigree-map-wrapper .wt-map-sidebar {
+        max-height: 13rem;
+        border-block-start: 1px solid var(--wt-archive-border, #d9d3c6);
+        border-inline-start: 0;
+    }
 }

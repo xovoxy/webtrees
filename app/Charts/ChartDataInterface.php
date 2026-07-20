@@ -25,27 +25,27 @@ interface ChartDataInterface extends JsonSerializable
 {
     public const string COLOR_WHITE = '#ffffff';
 
-    public const string COLOR_DEFAULT = '#84beff';
+    public const string COLOR_DEFAULT = '#557f88';
 
-    public const string COLOR_MALE = '#84beff';
+    public const string COLOR_MALE = '#557f88';
 
-    public const string COLOR_FEMALE = '#ffd1dc';
+    public const string COLOR_FEMALE = '#9a6076';
 
-    public const string COLOR_UNKNOWN_SEX = '#777777';
-    public const string COLOR_OTHER_SEX = '#ffb347';
+    public const string COLOR_UNKNOWN_SEX = '#68806b';
+    public const string COLOR_OTHER_SEX = '#ad6842';
 
-    public const string COLOR_CHART_RED = '#ff0000';
+    public const string COLOR_CHART_RED = '#ad6842';
 
     public const string COLOR_LIVING = self::COLOR_DEFAULT;
     public const string COLOR_DEAD = self::COLOR_EMPTY;
 
-    public const string COLOR_EMPTY = '#777777';
+    public const string COLOR_EMPTY = '#8b857c';
 
     public const array COLOR_PALETTE = [
-        '#8FA8C9', '#D7B892', '#CC9A96', '#9CBFC0',
-        '#9BBE95', '#D8C489', '#BBA3C7', '#D6AAB2',
-        '#B7A091', '#B8B8B1', '#95ADD9', '#9ECFBE',
-        '#9BA8BC', '#D9CC97', '#A8A1D6', '#9EC6DA',
+        '#557F88', '#9A6076', '#AD6842', '#68806B',
+        '#8A8752', '#526B79', '#776B86', '#795148',
+        '#3F7164', '#B7834F', '#8B7280', '#6B8179',
+        '#657780', '#A07B59', '#777187', '#78939A',
     ];
 
     public function hasData(): bool;

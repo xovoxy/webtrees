@@ -73,8 +73,8 @@ class StatisticsChartModule extends AbstractModule implements ModuleChartInterfa
     public const int Z_AXIS_SEX  = 301;
     public const int Z_AXIS_TIME = 302;
 
-    // First two colors are blue/pink, to work with Z_AXIS_SEX.
-    private const array Z_AXIS_COLORS = ['0000FF', 'FFA0CB', '9F00FF', 'FF7000', '905030', 'FF0000', '00FF00', 'F0F000'];
+    // First two colors are the archive palette's male/female accents.
+    private const array Z_AXIS_COLORS = ['557F88', '9A6076', 'AD6842', '68806B', '8A8752', '526B79', '776B86', '795148'];
 
     private const float DAYS_IN_YEAR = 365.25;
 

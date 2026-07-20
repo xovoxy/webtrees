@@ -124,3 +124,284 @@
 .wt-chart-box-name {
     font-weight: bold;
 }
+
+/* Shared visual foundation for the modern chart family. */
+:where(.wt-chart-page-heading) {
+    max-width: 88rem;
+    margin: 0 auto 1.35rem;
+}
+
+:where(.wt-chart-page-heading) .wt-page-title {
+    margin: 0;
+    text-align: start;
+}
+
+:where(.wt-chart-page-kicker) {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.35rem;
+    color: var(--wt-archive-copper-dark, #8d4f30);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+:where(.wt-chart-page-kicker) > span {
+    width: 1.8rem;
+    height: 1px;
+    background: currentcolor;
+}
+
+:where(.wt-chart-archive-canvas) {
+    background:
+        linear-gradient(rgb(40 90 79 / 3.5%) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(40 90 79 / 3.5%) 1px, transparent 1px),
+        var(--wt-archive-surface, #fffdfa);
+    background-size: 2rem 2rem;
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 1.25rem;
+    box-shadow: var(--wt-archive-shadow-sm, 0 8px 24px rgb(36 49 44 / 8%));
+    scrollbar-color: rgb(40 90 79 / 34%) transparent;
+    scrollbar-width: thin;
+}
+
+:where(.wt-chart-archive-canvas):focus-visible {
+    outline: 3px solid var(--wt-archive-focus, rgb(173 104 66 / 35%));
+    outline-offset: 3px;
+}
+
+:where(.wt-chart-loading) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 12rem;
+    color: var(--wt-archive-muted, #65716c);
+    font-size: 0.86rem;
+    font-weight: 650;
+}
+
+/* Shared control panel used by the chart menu modules. */
+.wt-page-options.wt-chart-options-panel {
+    position: relative;
+    max-width: 88rem;
+    margin: 0 auto 1.5rem;
+    padding: clamp(0.9rem, 2vw, 1.35rem) clamp(1rem, 2.2vw, 1.6rem);
+    overflow: hidden;
+    color: var(--wt-archive-ink, #24312c);
+    background:
+        radial-gradient(circle at 100% 0, rgb(173 104 66 / 9%), transparent 18rem),
+        var(--wt-archive-surface, #fffdfa);
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 1.25rem;
+    box-shadow: var(--wt-archive-shadow-sm, 0 8px 24px rgb(36 49 44 / 8%));
+}
+
+.wt-page-options.wt-chart-options-panel::before {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 0.28rem;
+    content: "";
+    background: linear-gradient(180deg, var(--wt-archive-pine, #285a4f), var(--wt-archive-copper, #ad6842));
+}
+
+.wt-chart-options-panel > .row,
+.wt-chart-options-panel > fieldset.row {
+    display: grid;
+    grid-template-columns: minmax(10rem, 0.32fr) minmax(0, 1fr);
+    align-items: center;
+    margin: 0;
+    padding: 0.58rem 0;
+    border-bottom: 1px solid rgb(217 211 198 / 68%);
+}
+
+.wt-chart-options-panel > .row:last-of-type,
+.wt-chart-options-panel > fieldset.row:last-of-type {
+    border-bottom: 0;
+}
+
+.wt-chart-options-panel > .row > *,
+.wt-chart-options-panel > fieldset.row > * {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0 0.65rem;
+}
+
+.wt-chart-options-panel .wt-page-options-label {
+    color: var(--wt-archive-ink, #24312c);
+    background: transparent;
+    border: 0;
+    font-size: 0.82rem;
+    font-weight: 780;
+    letter-spacing: 0.025em;
+}
+
+.wt-chart-options-panel .wt-page-options-label:not(:empty)::before {
+    display: inline-block;
+    width: 0.42rem;
+    height: 0.42rem;
+    margin-inline-end: 0.65rem;
+    content: "";
+    vertical-align: 0.08rem;
+    background: var(--wt-archive-copper, #ad6842);
+    border-radius: 50%;
+    box-shadow: 0 0 0 0.22rem rgb(173 104 66 / 10%);
+}
+
+.wt-chart-options-panel .wt-page-options-label:empty {
+    display: none;
+}
+
+.wt-chart-options-panel .wt-page-options-label:empty + .wt-page-options-value {
+    grid-column: 2;
+}
+
+.wt-chart-options-panel .wt-page-options-value {
+    color: inherit;
+    background: transparent;
+    border: 0;
+}
+
+.wt-chart-options-panel > .row > .col-sm-12 {
+    grid-column: 1 / -1;
+    padding-block: 0.35rem;
+    color: var(--wt-archive-copper-dark, #8d4f30);
+    font-family: "Iowan Old Style", "Noto Serif SC", Georgia, serif;
+    font-size: 0.95rem;
+}
+
+.wt-chart-options-panel .form-control,
+.wt-chart-options-panel .form-select,
+.wt-chart-options-panel .ts-control {
+    min-height: 2.9rem;
+    background: #fff;
+    border-color: var(--wt-archive-border, #d9d3c6);
+    border-radius: 0.7rem;
+    box-shadow: inset 0 1px 2px rgb(36 49 44 / 4%);
+}
+
+.wt-chart-options-panel .form-check {
+    min-height: 2rem;
+    align-content: center;
+    margin-bottom: 0;
+}
+
+.wt-chart-options-panel .form-check-label {
+    color: var(--wt-archive-muted, #65716c);
+    font-size: 0.85rem;
+    font-weight: 650;
+}
+
+.wt-chart-options-panel .btn {
+    min-height: 2.75rem;
+    padding-inline: 1.15rem;
+    border-radius: 0.68rem;
+}
+
+.wt-chart-options-panel .btn + .btn,
+.wt-chart-options-panel .btn + a,
+.wt-chart-options-panel a + .btn,
+.wt-chart-options-panel a + a {
+    margin-inline-start: 0.45rem;
+}
+
+/* The canvas is a bounded, keyboard-scrollable surface for oversized trees. */
+:where(.wt-chart-archive-canvas) {
+    --chart-line: 1.5px solid rgb(40 90 79 / 42%);
+    --chart-line-radius: 0.9rem;
+    width: calc(100% - 2rem);
+    max-width: 88rem;
+    min-height: 13rem;
+    margin: 0 auto 2rem;
+    padding: clamp(1rem, 2.5vw, 2rem);
+    overflow: auto;
+    overscroll-behavior: contain;
+}
+
+:where(.wt-chart-archive-canvas)::-webkit-scrollbar {
+    width: 0.48rem;
+    height: 0.48rem;
+}
+
+:where(.wt-chart-archive-canvas)::-webkit-scrollbar-thumb {
+    background: rgb(40 90 79 / 30%);
+    border-radius: 999px;
+}
+
+:where(.wt-chart-archive-canvas) .wt-chart-expansion-control {
+    min-height: 2.1rem;
+    margin-block: 0.25rem;
+    padding: 0.3rem 0.7rem !important;
+    color: var(--wt-archive-pine, #285a4f);
+    background: rgb(40 90 79 / 7%);
+    border-radius: 999px;
+    font-size: 0.77rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+:where(.wt-chart-archive-canvas) .wt-chart-expansion-control:hover {
+    background: rgb(40 90 79 / 13%);
+}
+
+:where(.wt-chart-archive-canvas) .wt-chart-horizontal-indent {
+    width: 2.35rem;
+}
+
+.wt-chart-map-panel,
+.wt-statistics-chart {
+    max-width: 88rem;
+    margin: 0 auto 2rem;
+    padding: clamp(0.8rem, 2vw, 1.25rem);
+    background: var(--wt-archive-surface, #fffdfa);
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 1.25rem;
+    box-shadow: var(--wt-archive-shadow-sm, 0 8px 24px rgb(36 49 44 / 8%));
+}
+
+@media (max-width: 48rem) {
+    .wt-chart-options-panel > .row,
+    .wt-chart-options-panel > fieldset.row {
+        grid-template-columns: 1fr;
+        gap: 0.45rem;
+        padding-block: 0.72rem;
+    }
+
+    .wt-chart-options-panel .wt-page-options-label:empty + .wt-page-options-value,
+    .wt-chart-options-panel > .row > .col-sm-12 {
+        grid-column: 1;
+    }
+
+    .wt-chart-options-panel > .row > *,
+    .wt-chart-options-panel > fieldset.row > * {
+        padding-inline: 0.25rem;
+    }
+
+    .wt-chart-options-panel .wt-page-options-label:empty {
+        display: none;
+    }
+
+    :where(.wt-chart-archive-canvas) {
+        width: calc(100% - 1rem);
+        padding: 0.85rem;
+        scroll-padding: 0.85rem;
+    }
+}
+
+@media print {
+    :where(.wt-chart-archive-canvas),
+    .wt-chart-map-panel,
+    .wt-statistics-chart {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+        overflow: visible;
+        background: #fff;
+        border: 0;
+        box-shadow: none;
+    }
+}

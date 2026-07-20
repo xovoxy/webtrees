@@ -18,3 +18,71 @@
  *
  * wt-chart, wt-chart-lifespans
  */
+.wt-chart-lifespans {
+    min-height: 21rem;
+}
+
+.wt-chart-lifespans .wt-lifespans-subtitle {
+    width: max-content;
+    max-width: 100%;
+    margin: 0 auto 1rem;
+    padding: 0.35rem 0.85rem;
+    color: var(--wt-archive-pine-dark, #183d35);
+    background: rgb(40 90 79 / 8%);
+    border: 1px solid rgb(40 90 79 / 16%);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.wt-chart-lifespans .wt-lifespans-scale {
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    width: max-content;
+    padding-top: 0.5rem;
+    background: rgb(255 253 250 / 92%);
+    border-bottom: 1px solid var(--wt-archive-border, #d9d3c6);
+    backdrop-filter: blur(8px);
+}
+
+.wt-chart-lifespans .wt-lifespans-decade {
+    height: 2.7rem;
+    padding: 0.45rem 0.55rem;
+    color: var(--wt-archive-muted, #65716c);
+    background: none;
+    border-inline-start: 1px solid rgb(40 90 79 / 20%);
+    font-family: "Iowan Old Style", "Noto Serif SC", Georgia, serif;
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.wt-chart-lifespans .wt-lifespans-individuals {
+    background:
+        linear-gradient(90deg, rgb(40 90 79 / 5%) 1px, transparent 1px),
+        linear-gradient(rgb(40 90 79 / 3%) 1px, transparent 1px),
+        rgb(255 253 250 / 72%);
+    background-size: 70px 100%, 100% 1.5rem;
+}
+
+.wt-chart-lifespans .wt-lifespans-individual {
+    height: 1.22rem;
+    padding: 0.12rem 0.48rem;
+    overflow: hidden;
+    color: var(--wt-archive-ink, #24312c);
+    border: 1px solid rgb(36 49 44 / 10%);
+    border-radius: 999px;
+    box-shadow: 0 2px 6px rgb(36 49 44 / 10%);
+    font-size: 0.72rem;
+    font-weight: 680;
+    line-height: 1;
+}
+
+.wt-chart-lifespans .wt-lifespans-summary {
+    padding: 0.75rem;
+    color: var(--wt-archive-ink, #24312c);
+    background: var(--wt-archive-surface, #fffdfa);
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 0.75rem;
+    box-shadow: var(--wt-archive-shadow, 0 16px 40px rgb(36 49 44 / 14%));
+}

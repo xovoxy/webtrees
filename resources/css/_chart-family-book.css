@@ -19,12 +19,53 @@
  * wt-chart, wt-chart-family-book
  */
 .wt-chart-family-book .wt-chart-box {
-    width: 15rem;
+    width: 13.5rem;
+    height: 6.4rem;
+    margin: 0.38rem;
+    padding: 0.78rem 0.9rem;
+    color: var(--wt-archive-ink, #24312c);
+    background: rgb(255 253 250 / 97%);
+    border-color: var(--wt-archive-border, #d9d3c6);
+    border-radius: 0.82rem;
+    box-shadow: 0 2px 4px rgb(36 49 44 / 6%), 0 9px 22px rgb(36 49 44 / 8%);
 }
 
 .wt-chart-family-book .wt-chart-box-lifespan {
-    display: none;
+    display: block;
+    margin-top: 0.22rem;
+    color: var(--wt-archive-muted, #65716c);
+    font-size: 0.73rem;
 }
 .wt-chart-family-book .wt-family-break {
     page-break-before: always;
+}
+
+.wt-chart-archive-canvas.wt-chart-family-book > h3 {
+    margin: 0.5rem 0 1rem;
+    color: var(--wt-archive-ink, #24312c);
+    font-family: "Iowan Old Style", "Noto Serif SC", Georgia, serif;
+    font-size: 1.25rem;
+}
+
+.wt-chart-archive-canvas.wt-chart-family-book > .wt-chart-family-book {
+    width: max-content;
+    min-width: 100%;
+    justify-content: center;
+}
+
+.wt-family-separator {
+    margin: 2rem 0;
+    color: var(--wt-archive-border, #d9d3c6);
+    opacity: 1;
+}
+
+@media (max-width: 48rem) {
+    .wt-chart-family-book .wt-chart-box {
+        width: 11.5rem;
+        height: 5.8rem;
+    }
+
+    .wt-chart-family-book .wt-chart-box-facts {
+        display: none;
+    }
 }

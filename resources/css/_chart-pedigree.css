@@ -5,48 +5,333 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
  * Pedigree chart
  *
- * wt-chart, wt-chart-pedigree
+ * A quiet family archive: compact controls, paper-like canvas, readable
+ * generation hierarchy and restrained colour for people and connectors.
  */
-.wt-chart-pedigree {
-    overflow-y: auto;
+.wt-pedigree-page-heading,
+.wt-page-options.wt-page-options-pedigree-chart,
+.wt-chart.wt-chart-pedigree {
+    max-width: 88rem;
 }
 
-.wt-chart-pedigree-left .wt-chart-box,
-.wt-chart-pedigree-right .wt-chart-box {
-    width: 15rem;
+.wt-page-options.wt-page-options-pedigree-chart {
+    position: relative;
+    margin: 0 auto 1.5rem;
+    padding: clamp(1rem, 2vw, 1.55rem);
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 100% 0, rgb(173 104 66 / 10%), transparent 18rem),
+        var(--wt-archive-surface, #fffdfa);
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 1.25rem;
+    box-shadow: var(--wt-archive-shadow-sm, 0 8px 24px rgb(36 49 44 / 8%));
 }
 
-.wt-chart-pedigree-up .wt-chart-box,
-.wt-chart-pedigree-down .wt-chart-box {
-    width: 10rem;
-    height: 8rem;
+.wt-page-options.wt-page-options-pedigree-chart::before {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 0.28rem;
+    content: "";
+    background: linear-gradient(180deg, var(--wt-archive-pine, #285a4f), var(--wt-archive-copper, #ad6842));
 }
 
-.wt-chart-pedigree .wt-chart-box-lifespan {
+.wt-pedigree-control-grid {
+    display: grid;
+    grid-template-columns: minmax(18rem, 1.7fr) minmax(8rem, 0.42fr) minmax(20rem, 1fr) auto;
+    align-items: end;
+    gap: clamp(0.8rem, 1.6vw, 1.3rem);
+}
+
+.wt-pedigree-control-field {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.wt-pedigree-control-field > .wt-page-options-label {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    width: auto;
+    margin: 0 0 0.5rem;
+    padding: 0;
+    color: var(--wt-archive-ink, #24312c);
+    background: transparent;
+    border: 0;
+    font-size: 0.86rem;
+    font-weight: 750;
+    letter-spacing: 0.015em;
+}
+
+.wt-pedigree-field-index {
+    display: inline-grid;
+    width: 1.7rem;
+    height: 1.7rem;
+    flex: 0 0 auto;
+    color: var(--wt-archive-pine, #285a4f);
+    background: rgb(40 90 79 / 9%);
+    border: 1px solid rgb(40 90 79 / 16%);
+    border-radius: 50%;
+    font-family: "Iowan Old Style", "Noto Serif SC", Georgia, serif;
+    font-size: 0.68rem;
+    place-items: center;
+}
+
+.wt-pedigree-control-field > .wt-page-options-value {
+    padding: 0;
+    color: inherit;
+    background: transparent;
+    border: 0;
+}
+
+.wt-pedigree-control-person .ts-control,
+.wt-pedigree-control-person .form-control,
+.wt-pedigree-control-generations .form-select {
+    min-height: 3rem;
+    padding: 0.65rem 0.8rem;
+    background: #fff;
+    border-color: var(--wt-archive-border, #d9d3c6);
+    border-radius: 0.72rem;
+    box-shadow: inset 0 1px 2px rgb(36 49 44 / 4%);
+}
+
+.wt-pedigree-layout-options {
+    display: flex;
+    min-height: 3rem;
+    padding: 0.28rem !important;
+    background: var(--wt-archive-surface-muted, #eeebe2) !important;
+    border: 1px solid var(--wt-archive-border, #d9d3c6) !important;
+    border-radius: 0.72rem;
+}
+
+.wt-pedigree-layout-options .form-check {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.wt-pedigree-layout-options .form-check-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.wt-pedigree-layout-options .form-check-label {
+    display: flex;
+    min-height: 2.35rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.38rem 0.58rem;
+    color: var(--wt-archive-muted, #65716c);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-align: center;
+    transition: color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+}
+
+.wt-pedigree-layout-options .form-check-input:checked + .form-check-label {
+    color: var(--wt-archive-pine-dark, #183d35);
+    background: #fff;
+    box-shadow: 0 2px 8px rgb(36 49 44 / 10%);
+}
+
+.wt-pedigree-layout-options .form-check-input:focus-visible + .form-check-label {
+    outline: 3px solid var(--wt-archive-focus, rgb(173 104 66 / 35%));
+    outline-offset: -1px;
+}
+
+.wt-pedigree-submit {
+    display: inline-flex;
+    min-width: 7.5rem;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.2rem;
+    padding-inline: 1rem;
+    border-radius: 0.72rem;
+}
+
+.wt-pedigree-submit span:last-child {
+    font-size: 1.05rem;
+    transition: transform 150ms ease;
+}
+
+.wt-pedigree-submit:hover span:last-child {
+    transform: translateX(0.2rem);
+}
+
+.wt-chart.wt-chart-pedigree {
+    margin: 0 auto;
+    padding: 0.25rem 0 2rem;
+    overflow: visible;
+}
+
+.wt-chart-pedigree-canvas {
+    --wt-pedigree-line: 1.5px solid rgb(40 90 79 / 46%);
+    width: 100%;
+    min-height: 21rem;
+    padding: clamp(1.25rem, 3vw, 2.5rem);
+    overflow: auto;
+    overscroll-behavior: contain;
+}
+
+.wt-chart-pedigree-canvas > .d-flex,
+.wt-chart-pedigree-canvas > .d-flex.flex-column {
+    width: max-content;
+    min-width: 100%;
+    justify-content: center;
+}
+
+.wt-chart-pedigree .wt-chart-box {
+    position: relative;
+    width: 14.5rem;
+    height: 7rem;
+    margin: 0.5rem 0.8rem;
+    padding: 0.9rem 1rem;
+    color: var(--wt-archive-ink, #24312c);
+    background: rgb(255 253 250 / 97%);
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 0.9rem;
+    box-shadow: 0 2px 4px rgb(36 49 44 / 6%), 0 10px 24px rgb(36 49 44 / 8%);
+    line-height: 1.3;
+    transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.wt-chart-pedigree .wt-chart-box:hover,
+.wt-chart-pedigree .wt-chart-box:focus-within {
+    z-index: 3;
+    border-color: rgb(40 90 79 / 48%);
+    box-shadow: 0 4px 10px rgb(36 49 44 / 9%), 0 18px 34px rgb(36 49 44 / 12%);
+    transform: translateY(-0.14rem);
+}
+
+.wt-chart-pedigree .wt-chart-box-f,
+.wt-chart-pedigree .wt-chart-box-m,
+.wt-chart-pedigree .wt-chart-box-u,
+.wt-chart-pedigree .wt-chart-box-x {
+    background: rgb(255 253 250 / 97%);
+    border-color: var(--wt-archive-border, #d9d3c6);
+}
+
+.wt-chart-pedigree .wt-chart-box::before {
+    position: absolute;
+    inset-block: 0.8rem;
+    inset-inline-start: 0;
+    width: 0.2rem;
+    content: "";
+    background: var(--sex-u-fg, #68806b);
+    border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.wt-chart-pedigree .wt-chart-box-f::before {
+    background: var(--sex-f-fg, #9a6076);
+}
+
+.wt-chart-pedigree .wt-chart-box-m::before {
+    background: var(--sex-m-fg, #557f88);
+}
+
+.wt-chart-pedigree .wt-chart-box-x::before {
+    background: var(--sex-x-fg, #94764b);
+}
+
+.wt-chart-pedigree .wt-generation-fwd-1 .wt-chart-box {
+    border-color: rgb(173 104 66 / 48%);
+    box-shadow: 0 4px 10px rgb(36 49 44 / 9%), 0 18px 34px rgb(36 49 44 / 11%);
+}
+
+.wt-chart-pedigree .wt-chart-box-name {
+    padding-inline-start: 0.2rem;
+    font-family: "Iowan Old Style", "Noto Serif SC", Georgia, serif;
+    font-size: 1rem;
+    font-weight: 750;
+    line-height: 1.28;
+}
+
+.wt-chart-pedigree .wt-chart-box-name a {
+    color: var(--wt-archive-ink, #24312c);
+}
+
+.wt-chart-pedigree .wt-chart-box-name-alt:empty {
     display: none;
 }
 
-/* Pedigree chart with oldest on the right */
+.wt-chart-pedigree .wt-chart-box-lifespan {
+    display: block;
+    margin-top: 0.28rem;
+    padding-inline-start: 0.2rem;
+    color: var(--wt-archive-muted, #65716c);
+    font-size: 0.74rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.wt-chart-pedigree .wt-chart-box-facts {
+    margin-top: 0.48rem;
+    padding-top: 0.42rem;
+    overflow: hidden;
+    color: var(--wt-archive-muted, #65716c);
+    border-top: 1px solid rgb(217 211 198 / 72%);
+    font-size: 0.72rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wt-chart-pedigree .wt-generation-fwd-3 .wt-chart-box-facts,
+.wt-chart-pedigree .wt-generation-fwd-4 .wt-chart-box-facts,
+.wt-chart-pedigree .wt-generation-fwd-5 .wt-chart-box-facts,
+.wt-chart-pedigree .wt-generation-fwd-6 .wt-chart-box-facts,
+.wt-chart-pedigree .wt-generation-fwd-7 .wt-chart-box-facts,
+.wt-chart-pedigree .wt-generation-fwd-8 .wt-chart-box-facts,
+.wt-chart-pedigree .wt-generation-fwd-9 .wt-chart-box-facts,
+.wt-chart-pedigree .wt-generation-fwd-10 .wt-chart-box-facts {
+    display: none;
+}
+
+.wt-chart-pedigree .wt-chart-box-thumbnail {
+    width: 2.5rem;
+    height: 2.9rem;
+    margin-right: 0.65rem !important;
+    overflow: hidden;
+    border-radius: 0.55rem;
+    box-shadow: 0 2px 8px rgb(36 49 44 / 12%);
+    object-fit: cover;
+}
+
+.wt-chart-pedigree .wt-chart-box-extra {
+    opacity: 0.42;
+    transition: opacity 150ms ease;
+}
+
+.wt-chart-pedigree .wt-chart-box:hover .wt-chart-box-extra,
+.wt-chart-pedigree .wt-chart-box:focus-within .wt-chart-box-extra {
+    opacity: 1;
+}
+
+.wt-chart-pedigree .wt-pedigree-lines {
+    border-color: rgb(40 90 79 / 46%) !important;
+}
+
+/* Pedigree chart with oldest on the right. */
 .wt-chart-pedigree-right .wt-pedigree-lines {
-    right: 0;
     top: 25%;
+    right: 0;
     bottom: 25%;
-    border: var(--chart-line);
-    border-right: none;
-    border-radius: var(--chart-line-radius) 0 0 var(--chart-line-radius);
     width: 25%;
     height: 50%;
+    border: var(--wt-pedigree-line);
+    border-right: 0;
+    border-radius: var(--chart-line-radius) 0 0 var(--chart-line-radius);
 }
 
 .wt-chart-pedigree-right .wt-generation-rev-2 > .wt-pedigree-lines {
@@ -55,16 +340,16 @@
     height: 75%;
 }
 
-/* Pedigree chart with oldest on the left */
+/* Pedigree chart with oldest on the left. */
 .wt-chart-pedigree-left .wt-pedigree-lines {
-    left: 0;
     top: 25%;
     bottom: 25%;
-    border: var(--chart-line);
-    border-left: none;
-    border-radius: 0 var(--chart-line-radius) var(--chart-line-radius) 0;
+    left: 0;
     width: 25%;
     height: 50%;
+    border: var(--wt-pedigree-line);
+    border-left: 0;
+    border-radius: 0 var(--chart-line-radius) var(--chart-line-radius) 0;
 }
 
 .wt-chart-pedigree-left .wt-generation-rev-2 > .wt-pedigree-lines {
@@ -73,46 +358,149 @@
     height: 75%;
 }
 
-/* Pedigree chart with oldest at the bottom */
-.wt-chart-pedigree-down {
-    width: max-content;
+/* Pedigree chart with oldest at the bottom. */
+.wt-chart-pedigree-down .wt-chart-box,
+.wt-chart-pedigree-up .wt-chart-box {
+    width: 11.5rem;
+    height: 7.5rem;
 }
 
 .wt-chart-pedigree-down .wt-pedigree-lines {
+    right: 25%;
     bottom: 0;
     left: 25%;
-    right: 25%;
-    border: var(--chart-line);
-    border-bottom: none;
-    border-radius: var(--chart-line-radius) var(--chart-line-radius) 0 0;
     width: 50%;
     height: 25%;
+    border: var(--wt-pedigree-line);
+    border-bottom: 0;
+    border-radius: var(--chart-line-radius) var(--chart-line-radius) 0 0;
 }
 
 .wt-chart-pedigree-down .wt-generation-rev-2 > .wt-pedigree-lines {
-    left: 12.5%;
     right: 12.5%;
+    left: 12.5%;
     width: 75%;
 }
 
-/* Pedigree chart with oldest at the top */
-.wt-chart-pedigree-up {
-    width: max-content;
-}
-
+/* Pedigree chart with oldest at the top. */
 .wt-chart-pedigree-up .wt-pedigree-lines {
     top: 0;
-    left: 25%;
     right: 25%;
-    border: var(--chart-line);
-    border-top: none;
-    border-radius: 0 0 var(--chart-line-radius) var(--chart-line-radius);
+    left: 25%;
     width: 50%;
     height: 25%;
+    border: var(--wt-pedigree-line);
+    border-top: 0;
+    border-radius: 0 0 var(--chart-line-radius) var(--chart-line-radius);
 }
 
 .wt-chart-pedigree-up .wt-generation-rev-2 > .wt-pedigree-lines {
-    left: 12.5%;
     right: 12.5%;
+    left: 12.5%;
     width: 75%;
+}
+
+.wt-chart-pedigree .dropdown.px-2 {
+    padding-inline: 0.35rem !important;
+}
+
+.wt-chart-pedigree .dropdown.px-2 > a {
+    display: inline-grid;
+    width: 2rem;
+    height: 2rem;
+    color: var(--wt-archive-pine, #285a4f);
+    background: var(--wt-archive-surface, #fffdfa);
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgb(36 49 44 / 9%);
+    place-items: center;
+}
+
+@media (max-width: 74rem) {
+    .wt-pedigree-control-grid {
+        grid-template-columns: minmax(16rem, 1fr) 9rem minmax(20rem, 1fr);
+    }
+
+    .wt-pedigree-control-action {
+        grid-column: 1 / -1;
+    }
+
+    .wt-pedigree-submit {
+        width: 100%;
+    }
+}
+
+@media (max-width: 48rem) {
+    .wt-pedigree-control-grid {
+        grid-template-columns: minmax(0, 1fr) 7.5rem;
+    }
+
+    .wt-pedigree-control-person,
+    .wt-pedigree-control-layout,
+    .wt-pedigree-control-action {
+        grid-column: 1 / -1;
+    }
+
+    .wt-pedigree-control-generations {
+        grid-column: 1 / 2;
+    }
+
+    .wt-pedigree-layout-options .form-check-label {
+        font-size: 0.76rem;
+    }
+
+    .wt-chart-pedigree-canvas {
+        min-height: 18rem;
+        padding: 1rem;
+        scroll-padding: 1rem;
+    }
+
+    .wt-chart-pedigree .wt-chart-box {
+        width: 12.25rem;
+        height: 6.5rem;
+        margin: 0.38rem 0.62rem;
+        padding: 0.78rem 0.85rem;
+    }
+
+    .wt-chart-pedigree-up .wt-chart-box,
+    .wt-chart-pedigree-down .wt-chart-box {
+        width: 10.5rem;
+        height: 6.75rem;
+    }
+
+    .wt-chart-pedigree .wt-chart-box-name {
+        font-size: 0.92rem;
+    }
+
+    .wt-chart-pedigree .wt-chart-box-facts {
+        display: none;
+    }
+}
+
+@media (max-width: 30rem) {
+    .wt-page-options.wt-page-options-pedigree-chart {
+        padding: 1rem 0.85rem 1rem 1.05rem;
+    }
+
+    .wt-pedigree-control-grid {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .wt-pedigree-layout-options {
+        overflow-x: auto;
+    }
+
+    .wt-pedigree-layout-options .form-check-label {
+        min-width: 4.25rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wt-chart-pedigree .wt-chart-box,
+    .wt-pedigree-submit span:last-child,
+    .wt-pedigree-layout-options .form-check-label {
+        transition: none;
+    }
 }

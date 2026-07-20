@@ -20,11 +20,9 @@ use Fisharebest\Webtrees\Tree;
 
 ?>
 
-<h2 class="wt-page-title">
-    <?= $title ?>
-</h2>
+<?= view('modules/charts/page-heading', ['title' => $title]) ?>
 
-<form method="post" class="wt-page-options wt-page-options-ancestors-chart d-print-none">
+<form method="post" class="wt-page-options wt-chart-options-panel wt-page-options-ancestors-chart d-print-none">
     <div class="row">
         <label class="col-sm-3 col-form-label wt-page-options-label" for="xref">
             <?= I18N::translate('Individual') ?>
@@ -62,6 +60,6 @@ use Fisharebest\Webtrees\Tree;
     <?= csrf_field() ?>
 </form>
 
-<div class="wt-page-content wt-chart wt-chart-ancestors" data-wt-ajax-url="<?= e($ajax_url) ?>">
-    <?= view('icons/spinner') ?>
+<div class="wt-page-content wt-chart wt-chart-archive-canvas wt-chart-ancestors" data-wt-ajax-url="<?= e($ajax_url) ?>" role="region" tabindex="0" aria-label="<?= e(strip_tags($title)) ?>" aria-live="polite">
+    <div class="wt-chart-loading"><?= view('icons/spinner') ?></div>
 </div>

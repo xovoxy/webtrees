@@ -20,15 +20,61 @@
  * +---- wt-chart-compact-table
  */
 .wt-chart.wt-chart-compact {
-    overflow-x: inherit;
+    overflow: auto;
 }
 
 .wt-chart-compact .wt-chart-box {
-    min-width: 5rem;
+    width: 7.5rem;
+    height: 4.8rem;
+    min-width: 7.5rem;
+    padding: 0.62rem;
+    color: var(--wt-archive-ink, #24312c);
+    background: rgb(255 253 250 / 97%);
+    border-color: var(--wt-archive-border, #d9d3c6);
+    border-radius: 0.72rem;
+    box-shadow: 0 2px 10px rgb(36 49 44 / 8%);
+    font-size: 0.78rem;
+    line-height: 1.25;
 }
 
 .wt-chart-compact .wt-chart-box-thumbnail,
 .wt-chart-compact .wt-chart-box-extra,
 .wt-chart-compact .wt-chart-box-facts {
     display: none;
+}
+
+.wt-chart-compact-table {
+    min-width: 68rem;
+    border-collapse: separate;
+    border-spacing: 0.28rem;
+}
+
+.wt-chart-compact-table td {
+    padding: 0.12rem;
+}
+
+.wt-chart-compact-table a:has(.wt-icon-arrow-left),
+.wt-chart-compact-table a:has(.wt-icon-arrow-right),
+.wt-chart-compact-table a:has(.wt-icon-arrow-up),
+.wt-chart-compact-table a:has(.wt-icon-arrow-down) {
+    display: inline-grid;
+    width: 1.85rem;
+    height: 1.85rem;
+    background: rgb(40 90 79 / 8%);
+    border: 1px solid rgb(40 90 79 / 16%);
+    border-radius: 50%;
+    place-items: center;
+}
+
+@media (max-width: 48rem) {
+    .wt-chart-compact-table {
+        min-width: 58rem;
+    }
+
+    .wt-chart-compact .wt-chart-box {
+        width: 6.5rem;
+        height: 4.4rem;
+        min-width: 6.5rem;
+        font-size: 0.72rem;
+    }
 }

@@ -22,18 +22,24 @@
 .tv_out {
     position: relative;
     overflow: hidden;
-    border: thin solid var(--bs-border-color); /* customizable */
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
     /* The chart height can be adjusted to fill the page */
     height: 50vh;
     resize: vertical;
     min-height: 25vh;
     max-height: 95vh;
-    background: var(--bs-secondary-bg); /* customizable */
+    background:
+        linear-gradient(rgb(40 90 79 / 3.5%) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(40 90 79 / 3.5%) 1px, transparent 1px),
+        var(--wt-archive-surface, #fffdfa);
+    background-size: 2rem 2rem;
     display: -webkit-box;
     display: -moz-box;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 1rem;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 62%);
 }
 .tv_out img {
     border: 0;
@@ -103,7 +109,7 @@
 /* horizontal and vertical lines color */
 .tv_tree_root .tv_vline,
 .tv_tree_root .tv_hline {
-    background-color: #81A9CB; /* customizable :should be the same color than in background images of td.tv_vline_x */
+    background-color: rgb(40 90 79 / 48%);
 }
 
 /* TD container for a vertical line */
@@ -157,19 +163,38 @@
 
 /* Person or couple(s) box style */
 .tv_tree_root .tv_box {
-    border: thin outset var(--bs-tertiary-color); /* customizable */
-    background: transparent; /* customizable */
-    margin-top: 2px;
-    margin-bottom: 2px;
-    padding: 0;
-    width: 180px; /* customizable:initial box width */
+    position: relative;
+    width: 190px;
+    margin: 4px;
+    padding: 0.45rem;
+    overflow: hidden;
+    color: var(--wt-archive-ink, #24312c);
+    background: rgb(255 253 250 / 97%);
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
     cursor: help; /* customizable */
     border-collapse: collapse; /* required */
-    border-radius: 4px; /* customizable */
-    box-shadow: var(--bs-box-shadow-sm); /* customizable */
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 4px rgb(36 49 44 / 6%), 0 9px 22px rgb(36 49 44 / 9%);
+    transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
 }
 .tv_tree_root .boxExpanded {
-    width: 250px; /* customizable:initial expanded box width */
+    width: 265px;
+}
+
+.tv_tree_root .tv_box:hover {
+    border-color: rgb(40 90 79 / 48%);
+    box-shadow: 0 4px 10px rgb(36 49 44 / 10%), 0 16px 32px rgb(36 49 44 / 12%);
+    transform: translateY(-1px);
+}
+
+.tv_tree_root .tv_box::before {
+    position: absolute;
+    inset-block: 0.55rem;
+    inset-inline-start: 0;
+    width: 0.2rem;
+    content: "";
+    background: var(--wt-archive-pine, #285a4f);
+    border-radius: 0 0.2rem 0.2rem 0;
 }
 .tv_tree_root .tv_box .tvSexSymbol {
     font-weight: bold;
@@ -185,8 +210,8 @@
     clear: both;
     border: 0;
     margin: 0;
-    padding: 0 4px;
-    border-radius: 4px; /* customizable */
+    padding: 0 5px;
+    border-radius: 0.55rem;
 }
 .tv_tree_root .tv_box .dates {
     float: none;
@@ -206,7 +231,7 @@
 }
 .tv_tree_root .tv_box .tv_person_expanded {
     min-height: 55px;
-    padding: 2px;
+    padding: 0.3rem;
 }
 .tv_tree_root .tv_box img {
     float: left;
@@ -220,6 +245,8 @@
 }
 .tv_tree_root .tv_box .tv_person_expanded a {
     font-weight: bold;
+    color: var(--wt-archive-ink, #24312c);
+    font-family: "Iowan Old Style", "Noto Serif SC", Georgia, serif;
 }
 
 .tv_tree_children {
@@ -239,15 +266,16 @@
 .tv_tools {
     display: inline-block;
     position: absolute;
-    left: 0;
-    top: 0;
-    padding: 0;
-    margin: 0; /* required */
+    top: 0.7rem;
+    left: 0.7rem;
+    padding: 0.28rem;
+    margin: 0;
     z-index: 90; /* should be < 100 because 100 is the z-index of WT menus */
-    background-color: var(--bs-tertiary-bg); /* customizable */
-    border: var(--bs-border-width) outset var(--bs-border-color); /* customizable */
-    border-radius: var(--bs-border-radius-sm); /* customizable */
-    box-shadow: var(--bs-box-shadow-sm); /* customizable */
+    background: rgb(255 253 250 / 92%);
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 0.7rem;
+    box-shadow: 0 6px 18px rgb(36 49 44 / 12%);
+    backdrop-filter: blur(8px);
 }
 
 .tv_tools ul {
@@ -260,19 +288,21 @@
     position: relative;
     padding: 0; /* required */
     margin: 0;
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     text-align: center;
     vertical-align: middle;
-    border: thin solid var(--bs-border-color); /* customizable */
-    border-radius: var(--bs-border-radius-sm);
+    border: 0;
+    border-radius: 0.48rem;
 }
 .tv_tools li.tv_button a {
     margin: 0;
     display: block;
 }
 .tv_tools li.tv_button:hover {
-    border: thin outset var(--bs-border-color); /* customizable */
+    color: var(--wt-archive-pine, #285a4f);
+    background: rgb(40 90 79 / 10%);
+    border: 0;
     cursor: pointer;
 }
 .tv_tools li.tvPressed {
@@ -282,11 +312,32 @@
     border: none;
     margin: 0;
     padding: 0;
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     cursor: pointer;
     text-align: center;
     vertical-align: middle;
+}
+
+@media (max-width: 48rem) {
+    .tv_out {
+        min-height: 28rem;
+        height: 62vh;
+    }
+
+    .tv_tree_root .tv_box {
+        width: 165px;
+    }
+
+    .tv_tree_root .boxExpanded {
+        width: 225px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tv_tree_root .tv_box {
+        transition: none;
+    }
 }
 .tv_tools ul li a.help img.icon {
     margin: 3px 0 0;
@@ -297,11 +348,13 @@
 
 
 .tvM {
-    background-color: var(--bs-primary-bg-subtle) !important;
+    color: var(--wt-archive-pine-dark, #183d35) !important;
+    background-color: #dce9e6 !important;
 }
 
 .tvF {
-    background-color: var(--bs-danger-bg-subtle) !important;
+    color: #633f4e !important;
+    background-color: #eadfe3 !important;
 }
 
 .dashed {

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Illuminate\Support\Collection;
 
@@ -14,6 +15,6 @@ use Illuminate\Support\Collection;
  */
 ?>
 
-<div class="wt-chart-pedigree-<?= e($style) ?>">
+<div class="wt-chart-archive-canvas wt-chart-pedigree-canvas wt-chart-pedigree-<?= e($style) ?>" role="region" tabindex="0" aria-label="<?= e(I18N::translate('Pedigree')) ?>">
     <?= view('modules/pedigree-chart/chart-' . $style, ['ancestors' => $ancestors, 'sosa' => 1, 'generation' => 1, 'generations' => $generations, 'links' => $links, 'spacer' => $spacer]) ?>
 </div>

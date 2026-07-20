@@ -18,3 +18,52 @@
  *
  * wt-chart, wt-chart-statistics
  */
+.wt-statistics-chart .nav-tabs {
+    gap: 0.35rem;
+    padding: 0.35rem;
+    background: var(--wt-archive-surface-muted, #eeebe2);
+    border: 0;
+    border-radius: 0.8rem;
+}
+
+.wt-statistics-chart .nav-link {
+    color: var(--wt-archive-muted, #65716c);
+    border: 0;
+    border-radius: 0.55rem;
+    font-size: 0.82rem;
+    font-weight: 720;
+}
+
+.wt-statistics-chart .nav-link:hover {
+    color: var(--wt-archive-pine, #285a4f);
+    background: rgb(255 253 250 / 70%);
+}
+
+.wt-statistics-chart .nav-link.active {
+    color: var(--wt-archive-pine-dark, #183d35);
+    background: var(--wt-archive-surface, #fffdfa);
+    box-shadow: 0 2px 8px rgb(36 49 44 / 10%);
+}
+
+.wt-statistics-chart .tab-content {
+    min-height: 18rem;
+    padding: clamp(1rem, 2vw, 1.5rem) 0.35rem 0.35rem;
+}
+
+.wt-statistics-chart .card,
+.wt-statistics-chart .table {
+    overflow: hidden;
+    border-color: var(--wt-archive-border, #d9d3c6);
+    border-radius: 0.75rem;
+}
+
+@media (max-width: 48rem) {
+    .wt-statistics-chart .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+
+    .wt-statistics-chart .nav-item {
+        flex: 0 0 auto;
+    }
+}

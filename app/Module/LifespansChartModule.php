@@ -75,10 +75,10 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
     protected const array DEFAULT_PARAMETERS = [];
 
     // Parameters for generating colors
-    protected const int RANGE      = 120; // degrees
-    protected const int SATURATION = 100; // percent
-    protected const int LIGHTNESS  = 30; // percent
-    protected const float ALPHA = 0.25;
+    protected const int RANGE      = 22; // degrees
+    protected const int SATURATION = 45; // percent
+    protected const int LIGHTNESS  = 36; // percent
+    protected const float ALPHA = 0.32;
 
     /**
      * Initialization.
@@ -403,9 +403,9 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
     private function layoutIndividuals(array $individuals): array
     {
         $color_generators = [
-            'M' => new ColorGenerator(240, self::SATURATION, self::LIGHTNESS, self::ALPHA, self::RANGE * -1),
-            'F' => new ColorGenerator(000, self::SATURATION, self::LIGHTNESS, self::ALPHA, self::RANGE),
-            'U' => new ColorGenerator(120, self::SATURATION, self::LIGHTNESS, self::ALPHA, self::RANGE),
+            'M' => new ColorGenerator(188, self::SATURATION, self::LIGHTNESS, self::ALPHA, self::RANGE * -1),
+            'F' => new ColorGenerator(338, self::SATURATION, self::LIGHTNESS, self::ALPHA, self::RANGE),
+            'U' => new ColorGenerator(104, self::SATURATION, self::LIGHTNESS, self::ALPHA, self::RANGE),
         ];
 
         $current_year = (int) date('Y');

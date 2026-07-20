@@ -19,13 +19,55 @@
  * wt-chart, wt-chart-hourglass
  */
 .wt-chart-hourglass {
-    overflow-y: auto;
+    overflow: auto;
 }
 
 .wt-chart-hourglass .wt-chart-box {
-    width: 15rem;
+    width: 13.5rem;
+    height: 6.4rem;
+    margin: 0.38rem;
+    padding: 0.78rem 0.9rem;
+    color: var(--wt-archive-ink, #24312c);
+    background: rgb(255 253 250 / 97%);
+    border-color: var(--wt-archive-border, #d9d3c6);
+    border-radius: 0.82rem;
+    box-shadow: 0 2px 4px rgb(36 49 44 / 6%), 0 9px 22px rgb(36 49 44 / 8%);
 }
 
 .wt-chart-hourglass .wt-chart-box-lifespan {
-    display: none;
+    display: block;
+    margin-top: 0.22rem;
+    color: var(--wt-archive-muted, #65716c);
+    font-size: 0.73rem;
+}
+
+.wt-chart-archive-canvas.wt-chart-hourglass > .wt-chart-hourglass {
+    width: max-content;
+    min-width: 100%;
+    justify-content: center;
+}
+
+.wt-chart-hourglass .hourglass-arrow {
+    display: inline-grid;
+    width: 2rem;
+    height: 2rem;
+    margin: 0.35rem;
+    color: var(--wt-archive-pine, #285a4f);
+    background: var(--wt-archive-surface, #fffdfa);
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgb(36 49 44 / 8%);
+    cursor: pointer;
+    place-items: center;
+}
+
+@media (max-width: 48rem) {
+    .wt-chart-hourglass .wt-chart-box {
+        width: 11.5rem;
+        height: 5.8rem;
+    }
+
+    .wt-chart-hourglass .wt-chart-box-facts {
+        display: none;
+    }
 }

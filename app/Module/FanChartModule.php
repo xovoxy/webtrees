@@ -260,11 +260,11 @@ class FanChartModule extends AbstractModule implements ModuleChartInterface, Req
 
         // Use theme-specified colors.
         $theme       = Registry::container()->get(ModuleThemeInterface::class);
-        $text_color  = $this->imageColor($image, '000000');
+        $text_color  = $this->imageColor($image, '24312c');
         $backgrounds = [
-            'M' => $this->imageColor($image, 'b1cff0'),
-            'F' => $this->imageColor($image, 'e9daf1'),
-            'U' => $this->imageColor($image, 'eeeeee'),
+            'M' => $this->imageColor($image, 'dce9e6'),
+            'F' => $this->imageColor($image, 'eadfe3'),
+            'U' => $this->imageColor($image, 'eeeae0'),
         ];
 
         // Co-ordinates are measured from the top-left corner.
