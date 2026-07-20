@@ -26,6 +26,7 @@ use Fisharebest\Webtrees\Http\Middleware\AuthAdministrator;
 use Fisharebest\Webtrees\Http\Middleware\AuthEditor;
 use Fisharebest\Webtrees\Http\Middleware\AuthLoggedIn;
 use Fisharebest\Webtrees\Http\Middleware\AuthManager;
+use Fisharebest\Webtrees\Http\Middleware\AuthMember;
 use Fisharebest\Webtrees\Http\Middleware\AuthModerator;
 use Fisharebest\Webtrees\Http\Middleware\AuthNotRobot;
 use Fisharebest\Webtrees\Http\RequestHandlers\AccountDelete;
@@ -118,6 +119,7 @@ use Fisharebest\Webtrees\Http\RequestHandlers\ExportGedcomClient;
 use Fisharebest\Webtrees\Http\RequestHandlers\ExportGedcomPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\ExportGedcomServer;
 use Fisharebest\Webtrees\Http\RequestHandlers\FamilyPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\FamilyPresentationPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\FaviconIco;
 use Fisharebest\Webtrees\Http\RequestHandlers\FindDuplicateRecords;
 use Fisharebest\Webtrees\Http\RequestHandlers\FixLevel0MediaAction;
@@ -606,6 +608,17 @@ class WebRoutes
                 $router->post(LinkChildToFamilyAction::class, '/link-child-to-family/{xref}');
                 $router->get(LinkSpouseToIndividualPage::class, '/link-spouse-to-individual/{xref}');
                 $router->post(LinkSpouseToIndividualAction::class, '/link-spouse-to-individual/{xref}');
+            });
+
+            // Member routes.
+            $router->attach('', '/tree/{tree}', static function (Map $router): void {
+                $router->extras([
+                    'middleware' => [
+                        AuthMember::class,
+                    ],
+                ]);
+
+                $router->get(FamilyPresentationPage::class, '/family-presentation{/xref}');
             });
 
             // User routes with a tree.

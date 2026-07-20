@@ -1,0 +1,210 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * @var array<mixed> $data
+ * @var string       $exit_url
+ */
+
+?>
+<div class="family-screen" id="family-screen">
+    <div class="family-screen__atmosphere" aria-hidden="true">
+        <span class="family-screen__glow family-screen__glow--one"></span>
+        <span class="family-screen__glow family-screen__glow--two"></span>
+        <span class="family-screen__grain"></span>
+    </div>
+
+    <header class="family-screen__header">
+        <div class="family-screen__identity">
+            <span class="family-screen__seal" aria-hidden="true">族</span>
+            <span>
+                <span class="family-screen__kicker">FAMILY MEMORY ARCHIVE</span>
+                <strong class="family-screen__tree-title"><?= e($data['tree']['title']) ?></strong>
+            </span>
+        </div>
+
+        <nav class="family-screen__modes" aria-label="大屏展示模式">
+            <button class="family-screen__mode is-active" type="button" data-mode="constellation">
+                <span class="family-screen__mode-index">01</span>
+                <span>全景族谱</span>
+            </button>
+            <button class="family-screen__mode" type="button" data-mode="timeline">
+                <span class="family-screen__mode-index">02</span>
+                <span>时光长河</span>
+            </button>
+            <button class="family-screen__mode" type="button" data-mode="overview">
+                <span class="family-screen__mode-index">03</span>
+                <span>家族概览</span>
+            </button>
+        </nav>
+
+        <div class="family-screen__tools">
+            <time class="family-screen__clock" id="family-screen-clock"></time>
+            <button class="family-screen__icon-button" id="family-screen-fullscreen" type="button" aria-label="进入全屏" title="进入全屏（F）">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/>
+                </svg>
+            </button>
+            <a class="family-screen__exit" href="<?= e($exit_url) ?>">退出大屏</a>
+        </div>
+    </header>
+
+    <main class="family-screen__canvas">
+        <section class="family-screen__panel is-active" data-panel="constellation" aria-labelledby="constellation-title">
+            <div class="family-screen__panel-heading">
+                <span class="family-screen__section-no">壹</span>
+                <span>
+                    <span class="family-screen__overline">MULTI-LINEAGE FAMILY PEDIGREE</span>
+                    <h1 id="constellation-title">多脉汇流，亲缘可循</h1>
+                </span>
+            </div>
+            <div class="constellation">
+                <svg class="constellation__map" id="constellation-map" viewBox="0 0 1600 900" role="img" aria-label="可拖动缩放的全景族谱"></svg>
+                <div class="constellation__toolbar" aria-label="族谱画布控制">
+                    <button type="button" data-pedigree-action="zoom-in" aria-label="放大族谱">＋</button>
+                    <button type="button" data-pedigree-action="zoom-out" aria-label="缩小族谱">−</button>
+                    <button type="button" data-pedigree-action="fit" aria-label="显示完整族谱">全览</button>
+                    <button type="button" data-pedigree-action="reset" aria-label="回到核心人物">归位</button>
+                </div>
+                <div class="constellation__legend" aria-hidden="true">
+                    <span><i class="constellation__legend-line constellation__legend-line--marriage"></i>婚姻关系</span>
+                    <span><i class="constellation__legend-line constellation__legend-line--blood"></i>亲子血缘</span>
+                    <span><i class="constellation__legend-hand">✥</i>拖动画布</span>
+                    <span><i class="constellation__legend-dot"></i>点击聚焦直系亲属</span>
+                </div>
+                <aside class="pedigree-tooltip" id="pedigree-tooltip" aria-live="polite">
+                    <span class="pedigree-tooltip__eyebrow">FAMILY MEMBER</span>
+                    <span class="pedigree-tooltip__identity">
+                        <i id="pedigree-tooltip-initial">族</i>
+                        <strong id="pedigree-tooltip-name">家族成员</strong>
+                    </span>
+                    <span class="pedigree-tooltip__life" id="pedigree-tooltip-life"></span>
+                    <span class="pedigree-tooltip__place" id="pedigree-tooltip-place"></span>
+                    <span class="pedigree-tooltip__relations" id="pedigree-tooltip-relations"></span>
+                </aside>
+                <aside class="pedigree-focus" id="pedigree-focus" aria-live="polite" hidden>
+                    <span class="pedigree-focus__eyebrow">个人血脉视角</span>
+                    <button id="pedigree-focus-clear" type="button" aria-label="退出个人血脉视角">恢复全族</button>
+                    <strong id="pedigree-focus-name">家族成员</strong>
+                    <span class="pedigree-focus__clan" id="pedigree-focus-clan"></span>
+                    <dl>
+                        <div><dt>父母</dt><dd id="pedigree-focus-parents">无记录</dd></div>
+                        <div><dt>伴侣</dt><dd id="pedigree-focus-spouses">无记录</dd></div>
+                        <div><dt>子女</dt><dd id="pedigree-focus-children">无记录</dd></div>
+                        <div><dt>兄弟姐妹</dt><dd id="pedigree-focus-siblings">无记录</dd></div>
+                    </dl>
+                </aside>
+                <div class="constellation__count">
+                    <strong><?= e((string) $data['stats']['individuals']) ?></strong>
+                    <span>位成员 · <?= e((string) $data['stats']['families']) ?> 个家庭</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="family-screen__panel" data-panel="timeline" aria-labelledby="timeline-title" hidden>
+            <div class="family-screen__panel-heading family-screen__panel-heading--timeline">
+                <span class="family-screen__section-no">贰</span>
+                <span>
+                    <span class="family-screen__overline">A RIVER THROUGH GENERATIONS</span>
+                    <h1 id="timeline-title">岁月流转，故事相连</h1>
+                </span>
+                <span class="family-screen__year-range">
+                    <b><?= e((string) ($data['stats']['earliest'] ?? '—')) ?></b>
+                    <i></i>
+                    <b><?= e((string) ($data['stats']['latest'] ?? '至今')) ?></b>
+                </span>
+            </div>
+            <div class="timeline" id="family-timeline">
+                <div class="timeline__scroll">
+                    <div class="timeline__canvas" id="timeline-canvas"></div>
+                </div>
+                <div class="timeline__hint">横向滚动，阅览家族时间长卷</div>
+            </div>
+        </section>
+
+        <section class="family-screen__panel" data-panel="overview" aria-labelledby="overview-title" hidden>
+            <div class="family-screen__panel-heading">
+                <span class="family-screen__section-no">叁</span>
+                <span>
+                    <span class="family-screen__overline">THE FAMILY IN NUMBERS</span>
+                    <h1 id="overview-title">一脉相承，生生不息</h1>
+                </span>
+            </div>
+            <div class="overview">
+                <article class="overview__hero">
+                    <div class="overview__rings" aria-hidden="true">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <div class="overview__hero-value">
+                        <strong><?= e((string) $data['stats']['individuals']) ?></strong>
+                        <span>家族成员</span>
+                    </div>
+                    <p>每一个名字，都是家族长卷中不可替代的一笔。</p>
+                </article>
+
+                <article class="overview__metric overview__metric--families">
+                    <span class="overview__label">已记录家庭</span>
+                    <strong><?= e((string) $data['stats']['families']) ?></strong>
+                    <span class="overview__unit">个家庭单元</span>
+                </article>
+
+                <article class="overview__metric overview__metric--living">
+                    <span class="overview__label">家族新章</span>
+                    <strong><?= e((string) $data['stats']['living']) ?></strong>
+                    <span class="overview__unit">位成员仍在续写故事</span>
+                </article>
+
+                <article class="overview__metric overview__metric--surnames">
+                    <span class="overview__label">姓氏脉络</span>
+                    <strong><?= e((string) $data['stats']['surnames']) ?></strong>
+                    <span class="overview__unit">个姓氏在此汇聚</span>
+                    <div class="overview__surnames" id="overview-surnames"></div>
+                </article>
+
+                <article class="overview__balance">
+                    <div class="overview__balance-copy">
+                        <span class="overview__label">成员构成</span>
+                        <strong><span><?= e((string) $data['stats']['male']) ?></span><i>:</i><span><?= e((string) $data['stats']['female']) ?></span></strong>
+                        <small>男性 · 女性</small>
+                    </div>
+                    <div class="overview__donut" id="overview-donut" aria-hidden="true"></div>
+                </article>
+
+                <article class="overview__cohorts">
+                    <div class="overview__cohorts-heading">
+                        <span class="overview__label">出生年代分布</span>
+                        <small>按十年统计</small>
+                    </div>
+                    <div class="overview__bars" id="overview-bars"></div>
+                </article>
+            </div>
+        </section>
+
+        <?php if ($data['nodes'] === []) : ?>
+            <div class="family-screen__empty">
+                <span class="family-screen__seal">族</span>
+                <h1>家族故事等待被记录</h1>
+                <p>添加家族成员后，这里会自动生成完整的大屏画卷。</p>
+            </div>
+        <?php endif ?>
+    </main>
+
+    <footer class="family-screen__footer">
+        <div class="family-screen__status">
+            <span class="family-screen__status-dot"></span>
+            <span id="family-screen-mode-description">多家族血脉通过婚姻汇流，点击人物查看直系亲属</span>
+        </div>
+        <div class="family-screen__autoplay">
+            <button id="family-screen-autoplay" type="button" aria-pressed="true">
+                <span class="family-screen__pause-icon" aria-hidden="true"></span>
+                <span id="family-screen-autoplay-label">暂停巡展</span>
+            </button>
+            <span class="family-screen__progress"><i id="family-screen-progress"></i></span>
+            <span class="family-screen__counter"><b id="family-screen-current">01</b> / 03</span>
+        </div>
+        <div class="family-screen__shortcuts">按 1—3 切换画面 · F 全屏 · 空格暂停</div>
+    </footer>
+</div>
+
+<script id="family-presentation-data" type="application/json"><?= json_encode($data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?></script>

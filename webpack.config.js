@@ -10,6 +10,7 @@ const cssEntries = [
   'administration',
   'clouds',
   'colors',
+  'family-presentation',
   'fab',
   'minimal',
   'webtrees',
@@ -27,6 +28,7 @@ module.exports = (env, argv) => ({
     entry: {
       'js/vendor.min': path.resolve(__dirname, 'resources/js/vendor.js'),
       'js/administration.min': path.resolve(__dirname, 'resources/js/administration.js'),
+      'js/family-presentation.min': path.resolve(__dirname, 'resources/js/family-presentation.js'),
       'js/webtrees.min': [
         path.resolve(__dirname, 'resources/js/webtrees.js'),
         path.resolve(__dirname, 'resources/js/statistics.js'),

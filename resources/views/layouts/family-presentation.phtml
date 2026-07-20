@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\Http\RequestHandlers\AppleTouchIconPng;
+use Fisharebest\Webtrees\Http\RequestHandlers\BrowserconfigXml;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Webtrees;
+
+/**
+ * @var string      $content
+ * @var string|null $meta_description
+ * @var string|null $meta_robots
+ * @var string      $title
+ */
+
+?>
+<!DOCTYPE html>
+<html dir="<?= I18N::locale()->direction() ?>" lang="<?= I18N::locale()->languageTag() ?>">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        <meta name="robots" content="<?= e($meta_robots ?? 'noindex,nofollow') ?>">
+        <meta name="generator" content="<?= e(Webtrees::NAME) ?> <?= e(Webtrees::VERSION) ?>">
+        <meta name="description" content="<?= $meta_description ?? '' ?>">
+        <meta name="theme-color" content="#061413">
+        <title><?= strip_tags($title) ?></title>
+
+        <link rel="apple-touch-icon" sizes="180x180" href="<?= e(route(AppleTouchIconPng::class)) ?>">
+        <link rel="icon" sizes="32x32" href="<?= e(asset('favicon-32.png')) ?>">
+        <meta name="msapplication-config" content="<?= e(route(BrowserconfigXml::class)) ?>">
+        <link rel="stylesheet" href="<?= e(asset('css/family-presentation.min.css')) ?>?v=20260720-15">
+    </head>
+    <body class="wt-family-presentation-page">
+        <?= $content ?>
+        <script src="<?= e(asset('js/family-presentation.min.js')) ?>?v=20260720-15"></script>
+    </body>
+</html>

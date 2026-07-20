@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Http\RequestHandlers\FamilyPresentationPage;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
 
@@ -15,6 +17,11 @@ use Illuminate\Support\Collection;
 <div class="row">
     <?php if ($main_blocks->isEmpty() || $side_blocks->isEmpty()) : ?>
         <div class="col-md-12 wt-main-blocks">
+            <?php if (Auth::isMember($tree)) : ?>
+                <?= view('family-presentation/entry', [
+                    'url' => route(FamilyPresentationPage::class, ['tree' => $tree->name()]),
+                ]) ?>
+            <?php endif ?>
             <?php foreach ($main_blocks->concat($side_blocks) as $block_id => $block) : ?>
                 <?= view('tree-page-block', ['block_id' => $block_id, 'block' => $block, 'tree' => $tree]) ?>
             <?php endforeach ?>
@@ -26,6 +33,11 @@ use Illuminate\Support\Collection;
             <?php endforeach ?>
         </div>
         <div class="col-md-4 wt-side-blocks">
+            <?php if (Auth::isMember($tree)) : ?>
+                <?= view('family-presentation/entry', [
+                    'url' => route(FamilyPresentationPage::class, ['tree' => $tree->name()]),
+                ]) ?>
+            <?php endif ?>
             <?php foreach ($side_blocks as $block_id => $block) : ?>
                 <?= view('tree-page-block', ['block_id' => $block_id, 'block' => $block, 'tree' => $tree]) ?>
             <?php endforeach ?>
