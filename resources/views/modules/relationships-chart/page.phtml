@@ -22,74 +22,79 @@ use Fisharebest\Webtrees\Tree;
 
 ?>
 
-<h2 class="wt-page-title">
-    <?= $title ?>
-</h2>
+<header class="wt-relationship-page-heading">
+    <div class="wt-relationship-page-kicker">
+        <span aria-hidden="true"></span>
+        <?= I18N::translate('Relationship') ?>
+    </div>
+    <h2 class="wt-page-title">
+        <?= $title ?>
+    </h2>
+</header>
 
 <form method="post" class="wt-page-options wt-page-options-relationships-chart d-print-none">
-    <div class="row">
-        <label class="col-sm-3 col-form-label wt-page-options-label" for="xref">
-            <?= I18N::translate('Individual 1') ?>
-        </label>
-        <div class="col-sm-9 wt-page-options-value">
+    <div class="wt-relationship-picker">
+        <div class="wt-relationship-person-field">
+            <div class="wt-relationship-field-heading">
+                <span class="wt-relationship-field-number" aria-hidden="true">01</span>
+                <label class="col-form-label wt-page-options-label" for="xref">
+                    <?= I18N::translate('Individual 1') ?>
+                </label>
+            </div>
             <?= view('components/select-individual', ['name' => 'xref', 'individual' => $individual1, 'tree' => $tree, 'required' => true]) ?>
         </div>
-    </div>
 
-    <div class="row">
-        <label class="col-sm-3 col-form-label wt-page-options-label" for="xref2">
-            <?= I18N::translate('Individual 2') ?>
-        </label>
-        <div class="col-sm-9 wt-page-options-value">
+        <button class="btn wt-relationship-swap" type="button" data-wt-swap-individuals-button data-wt-swap-first="#xref" data-wt-swap-second="#xref2" data-wt-swap-form=".wt-page-options-relationships-chart" title="<?= e(I18N::translate('Swap individuals')) ?>">
+            <span aria-hidden="true">⇄</span>
+            <span class="visually-hidden"><?= I18N::translate('Swap individuals') ?></span>
+        </button>
+
+        <div class="wt-relationship-person-field">
+            <div class="wt-relationship-field-heading">
+                <span class="wt-relationship-field-number" aria-hidden="true">02</span>
+                <label class="col-form-label wt-page-options-label" for="xref2">
+                    <?= I18N::translate('Individual 2') ?>
+                </label>
+            </div>
             <?= view('components/select-individual', ['name' => 'xref2', 'individual' => $individual2, 'tree' => $tree, 'required' => true]) ?>
         </div>
     </div>
 
-    <fieldset class="row mb-3">
-        <legend class="col-form-label col-sm-3 wt-page-options-label">
-        </legend>
-        <div class="col-sm-9 wt-page-options-value">
+    <div class="wt-relationship-options">
+        <fieldset class="wt-relationship-option-group">
+            <legend class="visually-hidden"><?= I18N::translate('Relationships') ?></legend>
             <?php if ($ancestors_only) : ?>
                 <input type="hidden" name="ancestors" value="1">
-                <?= I18N::translate('Find relationships via ancestors') ?>
+                <span class="wt-relationship-fixed-option"><?= I18N::translate('Find relationships via ancestors') ?></span>
             <?php else : ?>
                 <?= view('components/radios', ['name' => 'ancestors', 'options' => $ancestors_options, 'selected' => $ancestors]) ?>
             <?php endif ?>
-        </div>
-    </fieldset>
+        </fieldset>
 
-    <fieldset class="row mb-3">
-        <legend class="col-form-label col-sm-3 wt-page-options-label">
-        </legend>
-        <div class="col-sm-9 wt-page-options-value">
+        <fieldset class="wt-relationship-option-group">
+            <legend class="visually-hidden"><?= I18N::translate('Relationships') ?></legend>
             <?php if ($max_recursion === 0) : ?>
-                <?= I18N::translate('Find the closest relationships') ?>
+                <span class="wt-relationship-fixed-option"><?= I18N::translate('Find the closest relationships') ?></span>
                 <input type="hidden" name="recursion" value="0">
             <?php else : ?>
                 <?= view('components/radios', ['name' => 'recursion', 'options' => $recursion_options, 'selected' => $recursion]) ?>
             <?php endif ?>
-        </div>
-    </fieldset>
+        </fieldset>
 
-    <div class="row mb-3">
-        <div class="col-form-label col-sm-3 wt-page-options-label"></div>
-        <div class="col-sm-9 wt-page-options-value">
-            <button class="btn btn-primary" type="submit">
-                <?= /* I18N: A button label. */ I18N::translate('view') ?>
-            </button>
-
-            <button class="btn btn-link" type="button" data-wt-swap-individuals-button data-wt-swap-first="#xref" data-wt-swap-second="#xref2" data-wt-swap-form=".wt-page-options-relationships-chart">
-                <?= /* I18N: Reverse the order of two individuals */
-                I18N::translate('Swap individuals') ?>
-            </button>
-        </div>
+        <button class="btn btn-primary wt-relationship-submit" type="submit">
+            <span><?= /* I18N: A button label. */ I18N::translate('view') ?></span>
+            <span aria-hidden="true">→</span>
+        </button>
     </div>
 
     <?= csrf_field() ?>
 </form>
 
 <?php if ($individual1 !== null && $individual2 !== null) : ?>
-    <div class="wt-page-content wt-chart wt-chart-relationships" data-wt-ajax-url="<?= e($ajax_url) ?>">
-        <?= view('icons/spinner') ?>
+    <div class="wt-page-content wt-chart wt-chart-relationships" data-wt-ajax-url="<?= e($ajax_url) ?>" aria-live="polite">
+        <div class="wt-relationship-loading">
+            <?= view('icons/spinner') ?>
+            <span><?= I18N::translate('Relationships') ?></span>
+        </div>
     </div>
 <?php endif ?>

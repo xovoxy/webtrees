@@ -43,13 +43,10 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 use function array_map;
-use function asset;
 use function count;
 use function current;
-use function e;
 use function implode;
 use function in_array;
-use function max;
 use function min;
 use function next;
 use function ob_get_clean;
@@ -267,13 +264,6 @@ class RelationshipsChartModule extends AbstractModule implements ModuleChartInte
         $paths = $this->calculateRelationships($individual1, $individual2, $recursion, (bool) $ancestors);
 
         ob_start();
-        if (I18N::direction() === 'ltr') {
-            $diagonal1 = asset('css/images/dline.png');
-            $diagonal2 = asset('css/images/dline2.png');
-        } else {
-            $diagonal1 = asset('css/images/dline2.png');
-            $diagonal2 = asset('css/images/dline.png');
-        }
 
         $num_paths = 0;
         foreach ($paths as $path) {
@@ -295,78 +285,31 @@ class RelationshipsChartModule extends AbstractModule implements ModuleChartInte
 
             $relationship = $this->relationship_service->nameFromPath($nodes->all(), I18N::language());
 
-            echo '<h3>', I18N::translate('Relationship: %s', $relationship), '</h3>';
-
             $num_paths++;
 
-            // Use a table/grid for layout.
-            $table = [];
-            // Current position in the grid.
-            $x = 0;
-            $y = 0;
-            // Extent of the grid.
-            $min_y = 0;
-            $max_y = 0;
-            $max_x = 0;
-            // For each node in the path.
+            $individuals = [];
+            $links       = [];
+
             foreach ($path as $n => $xref) {
-                if ($n % 2 === 1) {
-                    switch ($relationships[$n]) {
-                        case 'hus':
-                        case 'wif':
-                        case 'spo':
-                        case 'bro':
-                        case 'sis':
-                        case 'sib':
-                            $table[$x + 1][$y] = '<div style="background:url(' . e(asset('css/images/hline.png')) . ') repeat-x center;  width: 94px; text-align: center"><div style="height: 32px;">' . $this->relationship_service->legacyNameAlgorithm($relationships[$n], Registry::individualFactory()->make($path[$n - 1], $tree), Registry::individualFactory()->make($path[$n + 1], $tree)) . '</div><div style="height: 32px;">' . view('icons/arrow-right') . '</div></div>';
-                            $x += 2;
-                            break;
-                        case 'son':
-                        case 'dau':
-                        case 'chi':
-                            if ($n > 2 && preg_match('/fat|mot|par/', $relationships[$n - 2])) {
-                                $table[$x + 1][$y - 1] = '<div style="background:url(' . $diagonal2 . '); width: 64px; height: 64px; text-align: center;"><div style="height: 32px; text-align: end;">' . $this->relationship_service->legacyNameAlgorithm($relationships[$n], Registry::individualFactory()->make($path[$n - 1], $tree), Registry::individualFactory()->make($path[$n + 1], $tree)) . '</div><div style="height: 32px; text-align: start;">' . view('icons/arrow-down') . '</div></div>';
-                                $x += 2;
-                            } else {
-                                $table[$x][$y - 1] = '<div style="background:url(' . e('"' . asset('css/images/vline.png') . '"') . ') repeat-y center; height: 64px; text-align: center;"><div style="display: inline-block; width:50%; line-height: 64px;">' . $this->relationship_service->legacyNameAlgorithm($relationships[$n], Registry::individualFactory()->make($path[$n - 1], $tree), Registry::individualFactory()->make($path[$n + 1], $tree)) . '</div><div style="display: inline-block; width:50%; line-height: 64px;">' . view('icons/arrow-down') . '</div></div>';
-                            }
-                            $y -= 2;
-                            break;
-                        case 'fat':
-                        case 'mot':
-                        case 'par':
-                            if ($n > 2 && preg_match('/son|dau|chi/', $relationships[$n - 2])) {
-                                $table[$x + 1][$y + 1] = '<div style="background:url(' . $diagonal1 . '); background-position: top right; width: 64px; height: 64px; text-align: center;"><div style="height: 32px; text-align: start;">' . $this->relationship_service->legacyNameAlgorithm($relationships[$n], Registry::individualFactory()->make($path[$n - 1], $tree), Registry::individualFactory()->make($path[$n + 1], $tree)) . '</div><div style="height: 32px; text-align: end;">' . view('icons/arrow-down') . '</div></div>';
-                                $x += 2;
-                            } else {
-                                $table[$x][$y + 1] = '<div style="background:url(' . e('"' . asset('css/images/vline.png') . '"') . ') repeat-y center; height: 64px; text-align:center; "><div style="display: inline-block; width: 50%; line-height: 64px;">' . $this->relationship_service->legacyNameAlgorithm($relationships[$n], Registry::individualFactory()->make($path[$n - 1], $tree), Registry::individualFactory()->make($path[$n + 1], $tree)) . '</div><div style="display: inline-block; width: 50%; line-height: 32px">' . view('icons/arrow-up') . '</div></div>';
-                            }
-                            $y += 2;
-                            break;
-                    }
-                    $max_x = max($max_x, $x);
-                    $min_y = min($min_y, $y);
-                    $max_y = max($max_y, $y);
-                } else {
-                    $individual    = Registry::individualFactory()->make($xref, $tree);
-                    $table[$x][$y] = view('chart-box', ['individual' => $individual]);
+                if ($n % 2 === 0) {
+                    $individuals[] = Registry::individualFactory()->make($xref, $tree);
+
+                    continue;
                 }
+
+                $links[] = $this->relationship_service->legacyNameAlgorithm(
+                    $relationships[$n],
+                    Registry::individualFactory()->make($path[$n - 1], $tree),
+                    Registry::individualFactory()->make($path[$n + 1], $tree),
+                );
             }
-            echo '<div class="wt-chart wt-chart-relationships">';
-            echo '<table style="border-collapse: collapse; margin: 20px 50px;">';
-            for ($y = $max_y; $y >= $min_y; --$y) {
-                echo '<tr>';
-                for ($x = 0; $x <= $max_x; ++$x) {
-                    echo '<td style="padding: 0;">';
-                    if (isset($table[$x][$y])) {
-                        echo $table[$x][$y];
-                    }
-                    echo '</td>';
-                }
-                echo '</tr>';
-            }
-            echo '</table>';
-            echo '</div>';
+
+            echo view('modules/relationships-chart/path', [
+                'individuals'  => $individuals,
+                'links'        => $links,
+                'path_number'  => $num_paths,
+                'relationship' => $relationship,
+            ]);
         }
 
         if (!$num_paths) {

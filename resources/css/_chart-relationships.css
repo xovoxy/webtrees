@@ -16,12 +16,575 @@
 /*
  * Relationships chart
  *
- * wt-chart, wt-chart-relationships
+ * A calm, editorial path through a family archive. The relationship engine
+ * still provides a linear list; this layer makes that path legible without
+ * the legacy table and tiled connector images.
  */
+.wt-relationship-page-heading {
+    max-width: 76rem;
+    margin: 0 auto 1.35rem;
+}
+
+.wt-relationship-page-kicker,
+.wt-relationship-path-kicker {
+    color: var(--wt-archive-copper-dark, #8d4f30);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.wt-relationship-page-kicker {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.35rem;
+}
+
+.wt-relationship-page-kicker > span {
+    width: 1.8rem;
+    height: 1px;
+    background: currentcolor;
+}
+
+.wt-relationship-page-heading .wt-page-title {
+    margin: 0;
+    text-align: start;
+}
+
+.wt-page-options.wt-page-options-relationships-chart {
+    position: relative;
+    max-width: 76rem;
+    margin: 0 auto 2rem;
+    padding: clamp(1.1rem, 2.2vw, 1.75rem);
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 100% 0, rgb(173 104 66 / 10%), transparent 18rem),
+        var(--wt-archive-surface, #fffdfa);
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 1.25rem;
+    box-shadow: var(--wt-archive-shadow-sm, 0 8px 24px rgb(36 49 44 / 8%));
+}
+
+.wt-page-options.wt-page-options-relationships-chart::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 0.28rem;
+    content: "";
+    background: linear-gradient(180deg, var(--wt-archive-pine, #285a4f), var(--wt-archive-copper, #ad6842));
+}
+
+.wt-relationship-picker {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: end;
+    gap: clamp(0.8rem, 2vw, 1.5rem);
+}
+
+.wt-relationship-person-field {
+    min-width: 0;
+}
+
+.wt-relationship-field-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.55rem;
+}
+
+.wt-relationship-field-number {
+    display: inline-grid;
+    width: 2rem;
+    height: 2rem;
+    color: var(--wt-archive-pine, #285a4f);
+    background: rgb(40 90 79 / 10%);
+    border: 1px solid rgb(40 90 79 / 18%);
+    border-radius: 50%;
+    font-family: "Iowan Old Style", "Noto Serif SC", Georgia, serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    place-items: center;
+}
+
+.wt-relationship-field-heading .col-form-label {
+    padding: 0;
+    color: var(--wt-archive-ink, #24312c);
+    background: transparent;
+    border: 0;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+}
+
+.wt-relationship-person-field .ts-wrapper,
+.wt-relationship-person-field .form-control {
+    width: 100%;
+}
+
+.wt-relationship-person-field .ts-control,
+.wt-relationship-person-field .form-control {
+    min-height: 3.15rem;
+    padding: 0.72rem 0.9rem;
+    background: #fff;
+    border-color: var(--wt-archive-border, #d9d3c6);
+    border-radius: 0.75rem;
+    box-shadow: inset 0 1px 2px rgb(36 49 44 / 4%);
+}
+
+.wt-relationship-swap {
+    display: inline-grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 0.2rem;
+    padding: 0;
+    color: var(--wt-archive-pine, #285a4f);
+    background: var(--wt-archive-surface-muted, #eeebe2);
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 50%;
+    font-size: 1.15rem;
+    line-height: 1;
+    place-items: center;
+    transition: color 160ms ease, background-color 160ms ease, transform 160ms ease;
+}
+
+.wt-relationship-swap:hover {
+    color: #fff;
+    background: var(--wt-archive-pine, #285a4f);
+    transform: rotate(180deg);
+}
+
+.wt-relationship-options {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+    padding-top: 1.15rem;
+    border-top: 1px solid var(--wt-archive-border, #d9d3c6);
+}
+
+.wt-relationship-option-group {
+    min-width: 0;
+    margin: 0;
+}
+
+.wt-relationship-option-group .form-check {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 1rem 0 0;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+.wt-relationship-option-group .form-check-label,
+.wt-relationship-fixed-option {
+    color: var(--wt-archive-muted, #65716c);
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+
+.wt-relationship-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    min-width: 8rem;
+    min-height: 2.8rem;
+    padding-inline: 1rem;
+    border-radius: 0.7rem;
+}
+
+.wt-relationship-submit span:last-child {
+    font-size: 1.1rem;
+    transition: transform 160ms ease;
+}
+
+.wt-relationship-submit:hover span:last-child {
+    transform: translateX(0.22rem);
+}
+
+.wt-chart.wt-chart-relationships {
+    max-width: 88rem;
+    margin: 0 auto;
+    padding: 0.25rem 0 2rem;
+    overflow: hidden;
+}
+
+.wt-relationship-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 12rem;
+    color: var(--wt-archive-muted, #65716c);
+}
+
+.wt-relationship-path {
+    position: relative;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    background:
+        linear-gradient(rgb(40 90 79 / 3%) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(40 90 79 / 3%) 1px, transparent 1px),
+        var(--wt-archive-surface, #fffdfa);
+    background-size: 2rem 2rem;
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 1.25rem;
+    box-shadow: var(--wt-archive-shadow-sm, 0 8px 24px rgb(36 49 44 / 8%));
+}
+
+.wt-relationship-path-heading {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem clamp(1.1rem, 2.5vw, 1.75rem);
+    background: rgb(255 253 250 / 88%);
+    border-bottom: 1px solid var(--wt-archive-border, #d9d3c6);
+    backdrop-filter: blur(8px);
+}
+
+.wt-relationship-path-number {
+    color: rgb(40 90 79 / 18%);
+    font-family: "Iowan Old Style", "Noto Serif SC", Georgia, serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.08em;
+    line-height: 1;
+}
+
+.wt-relationship-path-heading h3 {
+    margin: 0.1rem 0 0;
+    color: var(--wt-archive-ink, #24312c);
+    font-size: clamp(1.2rem, 2vw, 1.55rem);
+}
+
+.wt-relationship-route {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    min-width: 100%;
+    margin: 0;
+    padding: clamp(2rem, 4vw, 3.5rem) clamp(1.25rem, 3vw, 2.4rem);
+    list-style: none;
+}
+
+.wt-relationship-route-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-color: rgb(40 90 79 / 32%) transparent;
+    scrollbar-width: thin;
+}
+
+.wt-relationship-route-scroll::-webkit-scrollbar {
+    height: 0.45rem;
+}
+
+.wt-relationship-route-scroll::-webkit-scrollbar-thumb {
+    background: rgb(40 90 79 / 32%);
+    border-radius: 999px;
+}
+
+.wt-relationship-node {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+}
+
+.wt-relationship-person-shell {
+    position: relative;
+    padding-top: 0.75rem;
+}
+
+.wt-relationship-person-role {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 1rem;
+    padding: 0.18rem 0.6rem;
+    color: #fff;
+    background: var(--wt-archive-pine, #285a4f);
+    border-radius: 999px;
+    box-shadow: 0 3px 10px rgb(36 49 44 / 18%);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+}
+
+.wt-relationship-node-end .wt-relationship-person-role {
+    background: var(--wt-archive-copper-dark, #8d4f30);
+}
+
 .wt-chart-relationships .wt-chart-box {
-    width: 15rem;
+    position: relative;
+    width: 14.25rem;
+    height: auto;
+    min-height: 8.25rem;
+    padding: 1.1rem;
+    color: var(--wt-archive-ink, #24312c);
+    background: rgb(255 253 250 / 96%);
+    border: 1px solid var(--wt-archive-border, #d9d3c6);
+    border-radius: 1rem;
+    box-shadow: 0 2px 4px rgb(36 49 44 / 6%), 0 14px 30px rgb(36 49 44 / 9%);
+    line-height: 1.35;
+    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.wt-chart-relationships .wt-chart-box:hover,
+.wt-chart-relationships .wt-chart-box:focus-within {
+    border-color: rgb(40 90 79 / 48%);
+    box-shadow: 0 4px 8px rgb(36 49 44 / 8%), 0 20px 38px rgb(36 49 44 / 12%);
+    transform: translateY(-0.18rem);
+}
+
+.wt-chart-relationships .wt-chart-box-f,
+.wt-chart-relationships .wt-chart-box-m,
+.wt-chart-relationships .wt-chart-box-u,
+.wt-chart-relationships .wt-chart-box-x {
+    background: rgb(255 253 250 / 96%);
+    border-color: var(--wt-archive-border, #d9d3c6);
+}
+
+.wt-chart-relationships .wt-chart-box::before {
+    position: absolute;
+    top: 1rem;
+    bottom: 1rem;
+    left: 0;
+    width: 0.22rem;
+    content: "";
+    background: var(--sex-u-fg, #68806b);
+    border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.wt-chart-relationships .wt-chart-box-f::before {
+    background: var(--sex-f-fg, #9a6076);
+}
+
+.wt-chart-relationships .wt-chart-box-m::before {
+    background: var(--sex-m-fg, #557f88);
+}
+
+.wt-chart-relationships .wt-chart-box-x::before {
+    background: var(--sex-x-fg, #94764b);
+}
+
+.wt-relationship-node-start .wt-chart-box {
+    border-color: rgb(40 90 79 / 45%);
+}
+
+.wt-relationship-node-end .wt-chart-box {
+    border-color: rgb(173 104 66 / 48%);
+}
+
+.wt-chart-relationships .wt-chart-box-name {
+    padding-inline-start: 0.25rem;
+    font-family: "Iowan Old Style", "Noto Serif SC", Georgia, serif;
+    font-size: 1.16rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.wt-chart-relationships .wt-chart-box-name a {
+    color: var(--wt-archive-ink, #24312c);
 }
 
 .wt-chart-relationships .wt-chart-box-lifespan {
-    display: none;
+    display: block;
+    margin-top: 0.28rem;
+    padding-inline-start: 0.25rem;
+    color: var(--wt-archive-muted, #65716c);
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.wt-chart-relationships .wt-chart-box-facts {
+    margin-top: 0.7rem;
+    padding-top: 0.6rem;
+    color: var(--wt-archive-muted, #65716c);
+    border-top: 1px solid rgb(217 211 198 / 72%);
+}
+
+.wt-chart-relationships .wt-chart-box-fact {
+    font-size: 0.76rem;
+}
+
+.wt-chart-relationships .wt-chart-box-thumbnail {
+    width: 2.75rem;
+    height: 3.2rem;
+    margin-right: 0.75rem !important;
+    overflow: hidden;
+    border-radius: 0.65rem;
+    box-shadow: 0 2px 8px rgb(36 49 44 / 12%);
+    object-fit: cover;
+}
+
+.wt-chart-relationships .wt-chart-box-extra {
+    opacity: 0.45;
+    transition: opacity 160ms ease;
+}
+
+.wt-chart-relationships .wt-chart-box:hover .wt-chart-box-extra,
+.wt-chart-relationships .wt-chart-box:focus-within .wt-chart-box-extra {
+    opacity: 1;
+}
+
+.wt-relationship-edge {
+    display: flex;
+    flex: 0 0 clamp(4.5rem, 6vw, 6.5rem);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-width: 4.5rem;
+    margin-top: 0.8rem;
+}
+
+.wt-relationship-edge-label {
+    position: relative;
+    z-index: 1;
+    max-width: 8.5rem;
+    padding: 0.2rem 0.62rem;
+    overflow: hidden;
+    color: var(--wt-archive-pine-dark, #183d35);
+    background: var(--wt-archive-surface, #fffdfa);
+    border: 1px solid rgb(40 90 79 / 20%);
+    border-radius: 999px;
+    box-shadow: 0 2px 8px rgb(36 49 44 / 7%);
+    font-size: 0.72rem;
+    font-weight: 750;
+    line-height: 1.35;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wt-relationship-edge-track {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, rgb(40 90 79 / 32%), var(--wt-archive-pine, #285a4f));
+}
+
+.wt-relationship-edge-track::before {
+    position: absolute;
+    top: 50%;
+    left: -0.18rem;
+    width: 0.38rem;
+    height: 0.38rem;
+    content: "";
+    background: var(--wt-archive-surface, #fffdfa);
+    border: 1.5px solid var(--wt-archive-pine, #285a4f);
+    border-radius: 50%;
+    transform: translateY(-50%);
+}
+
+.wt-relationship-edge-track::after {
+    position: absolute;
+    top: 50%;
+    right: -0.05rem;
+    width: 0.55rem;
+    height: 0.55rem;
+    content: "";
+    border-top: 2px solid var(--wt-archive-pine, #285a4f);
+    border-right: 2px solid var(--wt-archive-pine, #285a4f);
+    transform: translateY(-50%) rotate(45deg);
+}
+
+@media (max-width: 767.98px) {
+    .wt-relationship-page-heading {
+        margin-bottom: 1rem;
+    }
+
+    .wt-relationship-picker {
+        grid-template-columns: 1fr;
+    }
+
+    .wt-relationship-swap {
+        justify-self: center;
+        margin: -0.15rem 0;
+        transform: rotate(90deg);
+    }
+
+    .wt-relationship-swap:hover {
+        transform: rotate(270deg);
+    }
+
+    .wt-relationship-options {
+        grid-template-columns: 1fr;
+    }
+
+    .wt-relationship-submit {
+        width: 100%;
+    }
+
+    .wt-chart.wt-chart-relationships {
+        padding-inline: 0;
+    }
+
+    .wt-relationship-path-heading {
+        padding: 1rem;
+    }
+
+    .wt-relationship-route {
+        flex-direction: column;
+        width: 100%;
+        min-width: 0;
+        padding: 1.5rem 1rem 2rem;
+    }
+
+    .wt-relationship-route-scroll {
+        overflow: visible;
+    }
+
+    .wt-relationship-edge {
+        flex: 0 0 5rem;
+        flex-direction: row-reverse;
+        gap: 0.8rem;
+        width: 16.5rem;
+        min-width: 0;
+        margin: 0;
+    }
+
+    .wt-chart-relationships .wt-chart-box {
+        width: 16.5rem;
+    }
+
+    .wt-relationship-edge-track {
+        width: 2px;
+        height: 100%;
+        background: linear-gradient(180deg, rgb(40 90 79 / 32%), var(--wt-archive-pine, #285a4f));
+    }
+
+    .wt-relationship-edge-track::before {
+        top: -0.1rem;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .wt-relationship-edge-track::after {
+        top: auto;
+        right: 50%;
+        bottom: 0;
+        transform: translateX(50%) rotate(135deg);
+    }
+
+    .wt-relationship-edge-label {
+        width: 7.25rem;
+        white-space: normal;
+    }
+}
+
+@media print {
+    .wt-relationship-path {
+        overflow: visible;
+        break-inside: avoid;
+        background: #fff;
+        box-shadow: none;
+    }
+
+    .wt-relationship-route {
+        width: max-content;
+    }
 }

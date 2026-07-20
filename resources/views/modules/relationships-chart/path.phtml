@@ -1,0 +1,63 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+
+/**
+ * @var array<int,Individual|null> $individuals
+ * @var array<int,string>          $links
+ * @var int                        $path_number
+ * @var string                     $relationship
+ */
+
+$last_index = count($individuals) - 1;
+
+?>
+
+<article class="wt-relationship-path">
+    <header class="wt-relationship-path-heading">
+        <span class="wt-relationship-path-number" aria-hidden="true"><?= str_pad((string) $path_number, 2, '0', STR_PAD_LEFT) ?></span>
+        <div>
+            <span class="wt-relationship-path-kicker"><?= I18N::translate('Relationship') ?></span>
+            <h3><?= e($relationship) ?></h3>
+        </div>
+    </header>
+
+    <div class="wt-relationship-route-scroll" role="region" aria-label="<?= e(I18N::translate('Relationship: %s', $relationship)) ?>" tabindex="0">
+        <ol class="wt-relationship-route">
+            <?php foreach ($individuals as $index => $individual) : ?>
+                <?php
+                $position = match ($index) {
+                    0           => 'start',
+                    $last_index => 'end',
+                    default     => 'middle',
+                };
+
+                $role = match ($position) {
+                    'start' => I18N::translate('Individual 1'),
+                    'end'   => I18N::translate('Individual 2'),
+                    default => '',
+                };
+                ?>
+
+                <li class="wt-relationship-node wt-relationship-node-<?= $position ?>">
+                    <div class="wt-relationship-person-shell">
+                        <?php if ($role !== '') : ?>
+                            <span class="wt-relationship-person-role"><?= $role ?></span>
+                        <?php endif ?>
+                        <?= view('chart-box', ['individual' => $individual]) ?>
+                    </div>
+                </li>
+
+                <?php if (isset($links[$index])) : ?>
+                    <li class="wt-relationship-edge" aria-label="<?= e($links[$index]) ?>">
+                        <span class="wt-relationship-edge-label"><?= e($links[$index]) ?></span>
+                        <span class="wt-relationship-edge-track" aria-hidden="true"></span>
+                    </li>
+                <?php endif ?>
+            <?php endforeach ?>
+        </ol>
+    </div>
+</article>

@@ -967,6 +967,16 @@ class Individual extends GedcomRecord
         // $full is for display on-screen
         $fullNN = str_replace('/', '', $full);
 
+        // Chinese names conventionally display the surname before the given name.
+        // Keep the GEDCOM and indexed values unchanged; only adjust the on-screen version.
+        if (
+            preg_match('/^\p{Han}+$/u', $GIVN) === 1 &&
+            preg_match('/^\p{Han}+$/u', $surname) === 1 &&
+            preg_match('/^(.*?)\s+(\/[^\/]+\/)$/u', $full, $matches) === 1
+        ) {
+            $full = $matches[2] . $matches[1];
+        }
+
         // Insert placeholders for any missing/unknown names
         $full = str_replace(self::NOMEN_NESCIO, I18N::translateContext('Unknown surname', '…'), $full);
         $full = str_replace(self::PRAENOMEN_NESCIO, I18N::translateContext('Unknown given name', '…'), $full);
