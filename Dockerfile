@@ -32,6 +32,7 @@ RUN apt-get update \
         intl \
         mbstring \
         opcache \
+        pdo_mysql \
         pdo_sqlite \
         xml \
         zip \
