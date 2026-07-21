@@ -115,6 +115,10 @@ declare(strict_types=1);
                     <span class="family-screen__overline">A RIVER THROUGH GENERATIONS</span>
                     <h1 id="timeline-title">岁月流转，故事相连</h1>
                 </span>
+                <span class="timeline__scale-switch" role="group" aria-label="时间轴比例">
+                    <button class="is-active" type="button" data-timeline-scale="narrative" aria-pressed="true">叙事视图</button>
+                    <button type="button" data-timeline-scale="proportional" aria-pressed="false">真实比例</button>
+                </span>
                 <span class="family-screen__year-range">
                     <b><?= e((string) ($data['stats']['earliest'] ?? '—')) ?></b>
                     <i></i>
@@ -125,7 +129,7 @@ declare(strict_types=1);
                 <div class="timeline__scroll">
                     <div class="timeline__canvas" id="timeline-canvas"></div>
                 </div>
-                <div class="timeline__hint">横向滚动，阅览家族时间长卷</div>
+                <div class="timeline__hint">弹性时间轴 · // 表示长时间压缩 · 悬停卡片置于最上层</div>
             </div>
         </section>
 

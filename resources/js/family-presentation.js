@@ -13,6 +13,7 @@ if (dataNode) {
   let activeMode = 'constellation';
   let autoplay = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let autoplayTimer = null;
+  let timelineScaleMode = 'narrative';
 
   const svgNamespace = 'http://www.w3.org/2000/svg';
   const modeButtons = Array.from(document.querySelectorAll('[data-mode]'));
@@ -991,49 +992,188 @@ if (dataNode) {
   const renderTimeline = () => {
     const canvas = document.getElementById('timeline-canvas');
     if (!canvas || data.events.length === 0) return;
+    const timeline = canvas.closest('.timeline');
+    canvas.replaceChildren();
     const events = data.events
       .filter((event) => Number.isFinite(Number(event.year)) && Number(event.year) !== 0)
       .sort((a, b) => Number(a.year) - Number(b.year));
     if (events.length === 0) return;
 
-    const minYear = Math.floor(Number(events[0].year) / 10) * 10;
-    const maxYear = Math.ceil(Number(events[events.length - 1].year) / 10) * 10;
+    const eventPriority = { marriage: 0, birth: 1, death: 2 };
+    const eventsByYear = new Map();
+    events.forEach((event) => {
+      const year = Number(event.year);
+      if (!eventsByYear.has(year)) eventsByYear.set(year, []);
+      eventsByYear.get(year).push(event);
+    });
+
+    const timelineItems = [];
+    [...eventsByYear.entries()].forEach(([year, yearEvents]) => {
+      const sortedEvents = [...yearEvents].sort((left, right) => (
+        (eventPriority[left.type] ?? 9) - (eventPriority[right.type] ?? 9)
+        || String(left.name || '').localeCompare(String(right.name || ''), 'zh-CN')
+      ));
+      sortedEvents.forEach((event, yearIndex) => timelineItems.push({
+        event,
+        type: event.type,
+        year,
+        yearCount: sortedEvents.length,
+        yearIndex,
+      }));
+    });
+    timelineItems.sort((left, right) => left.year - right.year || (eventPriority[left.type] ?? 8) - (eventPriority[right.type] ?? 8));
+
+    const occupiedYears = [...eventsByYear.keys()].sort((left, right) => left - right);
+    const firstEventYear = occupiedYears[0];
+    const lastEventYear = occupiedYears[occupiedYears.length - 1];
+    const minYear = Math.floor(firstEventYear / 10) * 10;
+    const maxYear = Math.ceil(lastEventYear / 10) * 10;
     const yearSpan = Math.max(10, maxYear - minYear);
-    const canvasWidth = Math.max(window.innerWidth - 96, yearSpan * 18, events.length * 115);
+    const yearMetrics = new Map([[firstEventYear, 0]]);
+    const compressedGaps = [];
+    let narrativeSpan = 0;
+    occupiedYears.slice(1).forEach((year, index) => {
+      const previousYear = occupiedYears[index];
+      const difference = year - previousYear;
+      let visualDistance = difference;
+      if (difference > 5 && difference <= 12) visualDistance = 5 + (difference - 5) * .45;
+      if (difference > 12) {
+        visualDistance = 8.15 + Math.min(3.2, Math.log2(difference - 10) * .8);
+        compressedGaps.push({ from: previousYear, to: year, years: difference });
+      }
+      narrativeSpan += visualDistance;
+      yearMetrics.set(year, narrativeSpan);
+    });
+
+    const timelineMetric = (year) => {
+      if (timelineScaleMode === 'proportional') return year - minYear;
+      return yearMetrics.get(year) ?? 0;
+    };
+    const metricSpan = timelineScaleMode === 'proportional' ? yearSpan : narrativeSpan;
+    const estimatedHeight = Math.max(360, window.innerHeight - 270);
+    const maximumOffset = estimatedHeight / 2 - 52;
+    const laneOffsets = [];
+    for (let depth = 78; depth <= maximumOffset && laneOffsets.length < 8; depth += 94) {
+      laneOffsets.push(-depth, depth);
+    }
+    if (laneOffsets.length < 4) laneOffsets.push(-172, 172);
+
+    const cardWidth = 180;
+    const sameYearStep = Math.ceil((cardWidth + 24) / laneOffsets.length);
+    const maximumYearCount = Math.max(...[...eventsByYear.values()].map((yearEvents) => yearEvents.length));
+    const maximumFanExtent = Math.max(0, (maximumYearCount - 1) / 2 * sameYearStep);
+    const axisPadding = Math.max(120, maximumFanExtent + cardWidth / 2 + 20);
+    const axisX = (year, width) => metricSpan === 0
+      ? width / 2
+      : axisPadding + (timelineMetric(year) / metricSpan) * (width - axisPadding * 2);
+    const eventX = (item, width) => (
+      axisX(item.year, width) + (item.yearIndex - (item.yearCount - 1) / 2) * sameYearStep
+    );
+    const arrangeItems = (width) => {
+      const laneRightEdges = laneOffsets.map(() => Number.NEGATIVE_INFINITY);
+      const placements = [];
+      let overflow = 0;
+      timelineItems.forEach((item, itemIndex) => {
+        const x = eventX(item, width);
+        const halfWidth = cardWidth / 2;
+        const left = x - halfWidth;
+        const alternatingOrder = itemIndex % 2 === 0
+          ? laneOffsets.map((offset, index) => ({ index, offset }))
+          : laneOffsets.map((offset, index) => ({ index, offset })).sort((a, b) => (
+            Math.abs(a.offset) - Math.abs(b.offset) || b.offset - a.offset
+          ));
+        const lane = alternatingOrder.find(({ index }) => left >= laneRightEdges[index] + 24);
+        if (!lane) {
+          overflow += 1;
+          return;
+        }
+        laneRightEdges[lane.index] = x + halfWidth;
+        placements.push({ item, lane: lane.index, offset: lane.offset, x });
+      });
+      return { overflow, placements };
+    };
+
+    let canvasWidth = Math.max(
+      window.innerWidth - 96,
+      timelineItems.length * 132,
+      timelineScaleMode === 'proportional' ? yearSpan * 24 : Math.max(1, narrativeSpan) * 54,
+    );
+    let arrangement = arrangeItems(canvasWidth);
+    for (let attempt = 0; arrangement.overflow > 0 && attempt < 8; attempt += 1) {
+      canvasWidth = Math.ceil(canvasWidth * 1.18);
+      arrangement = arrangeItems(canvasWidth);
+    }
     canvas.style.width = `${canvasWidth}px`;
 
     const axis = document.createElement('div');
     axis.className = 'timeline__axis';
     canvas.append(axis);
 
-    for (let year = minYear; year <= maxYear; year += 10) {
+    const narrativeDecades = new Map();
+    occupiedYears.forEach((year) => {
+      const decade = Math.floor(year / 10) * 10;
+      if (!narrativeDecades.has(decade)) narrativeDecades.set(decade, { label: decade, year });
+    });
+    const decadeMarkers = timelineScaleMode === 'proportional'
+      ? Array.from({ length: Math.floor((maxYear - minYear) / 10) + 1 }, (_, index) => ({
+        label: minYear + index * 10,
+        year: minYear + index * 10,
+      }))
+      : [...narrativeDecades.values()];
+    decadeMarkers.forEach(({ label, year }) => {
       const marker = document.createElement('span');
       marker.className = 'timeline__decade';
-      marker.style.left = `${48 + ((year - minYear) / yearSpan) * (canvasWidth - 96)}px`;
-      marker.textContent = `${year}s`;
+      marker.style.left = `${axisX(year, canvasWidth)}px`;
+      marker.textContent = `${label}s`;
       canvas.append(marker);
+    });
+
+    if (timelineScaleMode === 'narrative') {
+      compressedGaps.forEach((gap) => {
+        const gapMarker = document.createElement('span');
+        gapMarker.className = 'timeline__gap';
+        gapMarker.style.left = `${(axisX(gap.from, canvasWidth) + axisX(gap.to, canvasWidth)) / 2}px`;
+        gapMarker.title = `${gap.from}年至${gap.to}年，时间跨度${gap.years}年`;
+        const breakMark = document.createElement('i');
+        const label = document.createElement('b');
+        label.textContent = `跨越 ${gap.years} 年`;
+        gapMarker.append(breakMark, label);
+        canvas.append(gapMarker);
+      });
     }
 
-    const laneOffsets = [-150, 150, -245, 245, -70, 70];
-    events.forEach((event, index) => {
-      const x = 48 + ((Number(event.year) - minYear) / yearSpan) * (canvasWidth - 96);
-      const offset = laneOffsets[index % laneOffsets.length];
+    document.querySelectorAll('[data-timeline-scale]').forEach((button) => {
+      const active = button.dataset.timelineScale === timelineScaleMode;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    const timelineHint = timeline?.querySelector('.timeline__hint');
+    if (timelineHint) {
+      timelineHint.textContent = timelineScaleMode === 'narrative'
+        ? '弹性时间轴 · // 表示长时间压缩 · 悬停卡片置于最上层'
+        : '真实年份比例 · 横向滚动阅览 · 悬停卡片置于最上层';
+    }
+
+    arrangement.placements.forEach(({ item, offset, x }, index) => {
       const above = offset < 0;
       const card = document.createElement('article');
-      card.className = `timeline__event timeline__event--${event.type} ${above ? 'is-above' : 'is-below'}`;
+      card.className = `timeline__event timeline__event--${item.type} ${above ? 'is-above' : 'is-below'}`;
+      card.tabIndex = 0;
+      card.setAttribute('aria-label', `${item.year}年，${item.event.label || '家族记事'}，${item.event.name || '未具名'}`);
       card.style.left = `${x}px`;
       card.style.top = `calc(50% + ${offset}px)`;
-      card.style.setProperty('--event-stem', `${Math.max(46, Math.abs(offset) - 58)}px`);
+      card.style.setProperty('--event-stem', `${Math.max(34, Math.abs(offset) - 43)}px`);
+      card.style.setProperty('--event-index', String(index));
 
       const year = document.createElement('span');
       year.className = 'timeline__event-year';
-      year.textContent = `${event.year} · ${event.label}`;
+      year.textContent = `${item.year} · ${item.event.label}`;
       const name = document.createElement('strong');
       name.className = 'timeline__event-name';
-      name.textContent = event.name || '家族记事';
+      name.textContent = item.event.name || '家族记事';
       const meta = document.createElement('span');
       meta.className = 'timeline__event-meta';
-      meta.textContent = event.place || (event.type === 'birth' ? '一个新的故事由此开始' : '被时间珍藏的家族记忆');
+      meta.textContent = item.event.place || (item.event.type === 'birth' ? '一个新的故事由此开始' : '被时间珍藏的家族记忆');
       const dot = document.createElement('i');
       dot.className = 'timeline__event-dot';
       card.append(year, name, meta, dot);
@@ -1129,6 +1269,22 @@ if (dataNode) {
   };
 
   modeButtons.forEach((button) => button.addEventListener('click', () => setMode(button.dataset.mode)));
+  document.querySelectorAll('[data-timeline-scale]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const nextMode = button.dataset.timelineScale;
+      if (!['narrative', 'proportional'].includes(nextMode) || nextMode === timelineScaleMode) return;
+      if (autoplay) toggleAutoplay();
+      const scroller = document.querySelector('.timeline__scroll');
+      const scrollableWidth = Math.max(1, (scroller?.scrollWidth || 1) - (scroller?.clientWidth || 0));
+      const scrollProgress = (scroller?.scrollLeft || 0) / scrollableWidth;
+      timelineScaleMode = nextMode;
+      renderTimeline();
+      window.requestAnimationFrame(() => {
+        if (!scroller) return;
+        scroller.scrollLeft = scrollProgress * Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+      });
+    });
+  });
   autoplayButton?.addEventListener('click', toggleAutoplay);
   document.getElementById('family-screen-fullscreen')?.addEventListener('click', async () => {
     if (document.fullscreenElement) await document.exitFullscreen();

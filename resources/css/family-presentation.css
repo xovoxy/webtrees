@@ -769,13 +769,44 @@ button:focus-visible, a:focus-visible {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-left: auto;
+    margin-left: 1rem;
     color: var(--screen-copper-bright);
     font-family: Georgia, serif;
 }
 
 .family-screen__year-range b { font-size: 1.2rem; font-weight: 400; }
 .family-screen__year-range i { width: 4rem; height: 1px; background: linear-gradient(90deg, var(--screen-copper), transparent); }
+
+.timeline__scale-switch {
+    display: inline-flex;
+    gap: .18rem;
+    margin-left: auto;
+    padding: .2rem;
+    pointer-events: auto;
+    border: 1px solid rgb(244 234 216 / 10%);
+    background: rgb(4 20 18 / 62%);
+    box-shadow: inset 0 0 1rem rgb(105 185 169 / 3%);
+}
+
+.timeline__scale-switch button {
+    min-width: 4.8rem;
+    padding: .38rem .62rem;
+    color: rgb(244 234 216 / 34%);
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: .56rem;
+    letter-spacing: .1em;
+    transition: color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+.timeline__scale-switch button:hover { color: rgb(244 234 216 / 68%); }
+
+.timeline__scale-switch button.is-active {
+    color: var(--screen-copper-bright);
+    background: linear-gradient(135deg, rgb(211 161 102 / 13%), rgb(105 185 169 / 8%));
+    box-shadow: inset 0 -1px 0 rgb(211 161 102 / 64%);
+}
 
 .timeline {
     position: absolute;
@@ -835,20 +866,87 @@ button:focus-visible, a:focus-visible {
     background: rgb(211 161 102 / 32%);
 }
 
+.timeline__gap {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    width: 7rem;
+    height: 2.2rem;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+
+.timeline__gap i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1.65rem;
+    height: 1.2rem;
+    background: var(--screen-ink);
+    box-shadow: 0 0 1.2rem .65rem var(--screen-ink);
+    transform: translate(-50%, -50%);
+}
+
+.timeline__gap i::before,
+.timeline__gap i::after {
+    position: absolute;
+    top: .08rem;
+    width: 1px;
+    height: 1rem;
+    content: "";
+    background: linear-gradient(transparent, var(--screen-copper-bright) 24% 76%, transparent);
+    transform: rotate(24deg);
+}
+
+.timeline__gap i::before { left: .5rem; }
+.timeline__gap i::after { right: .5rem; }
+
+.timeline__gap b {
+    position: absolute;
+    right: 0;
+    bottom: calc(50% + .9rem);
+    left: 0;
+    color: rgb(240 201 145 / 54%);
+    font-family: Georgia, serif;
+    font-size: .56rem;
+    font-weight: 400;
+    letter-spacing: .12em;
+    text-align: center;
+    white-space: nowrap;
+}
+
 .timeline__event {
     --event-color: var(--screen-jade);
     position: absolute;
+    z-index: 3;
     width: 10.5rem;
+    min-height: 5rem;
     padding: .75rem .85rem .7rem;
     color: var(--screen-paper);
     border: 1px solid rgb(105 185 169 / 17%);
     background: linear-gradient(135deg, rgb(13 43 40 / 88%), rgb(5 20 19 / 76%));
     backdrop-filter: blur(.7rem);
     transform: translate(-50%, -50%);
+    text-align: left;
+    font: inherit;
+    animation: timeline-event-enter .58s cubic-bezier(.2, .8, .2, 1) backwards;
+    animation-delay: calc(var(--event-index, 0) * 28ms);
+    transition: opacity .22s ease, border-color .22s ease, background .22s ease, box-shadow .22s ease, transform .22s cubic-bezier(.2, .8, .2, 1);
 }
 
 .timeline__event--marriage { --event-color: var(--screen-copper); border-color: rgb(211 161 102 / 24%); }
 .timeline__event--death { --event-color: #a89492; opacity: .78; }
+.timeline__event:hover,
+.timeline__event:focus-visible {
+    z-index: 30;
+    opacity: 1;
+    border-color: color-mix(in srgb, var(--event-color) 72%, transparent);
+    background: linear-gradient(135deg, rgb(18 55 50 / 98%), rgb(6 25 23 / 98%));
+    box-shadow: 0 1.2rem 3rem rgb(0 0 0 / 38%), 0 0 1.8rem color-mix(in srgb, var(--event-color) 18%, transparent);
+    outline: 1px solid color-mix(in srgb, var(--event-color) 36%, transparent);
+    outline-offset: .18rem;
+    transform: translate(-50%, calc(-50% - .4rem)) scale(1.045);
+}
 
 .timeline__event::after {
     position: absolute;
@@ -859,8 +957,15 @@ button:focus-visible, a:focus-visible {
     background: linear-gradient(var(--event-color), transparent);
 }
 
-.timeline__event.is-above::after { top: 100%; }
-.timeline__event.is-below::after { bottom: 100%; transform: rotate(180deg); transform-origin: bottom; }
+.timeline__event.is-above::after {
+    top: 100%;
+    background: linear-gradient(var(--event-color), transparent);
+}
+
+.timeline__event.is-below::after {
+    bottom: 100%;
+    background: linear-gradient(transparent, var(--event-color));
+}
 
 .timeline__event-dot {
     position: absolute;
@@ -994,6 +1099,7 @@ button:focus-visible, a:focus-visible {
 @keyframes screen-progress { to { transform: scaleX(1); } }
 @keyframes screen-status { 50% { opacity: .35; box-shadow: 0 0 .2rem var(--screen-jade); } }
 @keyframes overview-pulse { 50% { opacity: .45; transform: translate(-50%, -50%) scale(1.06); } }
+@keyframes timeline-event-enter { from { opacity: 0; transform: translate(-50%, calc(-50% + .75rem)); } to { opacity: 1; transform: translate(-50%, -50%); } }
 @keyframes pedigree-focus-enter { from { opacity: 0; transform: translateY(.7rem); } to { opacity: 1; transform: none; } }
 @keyframes pedigree-branch-draw { to { stroke-dasharray: 100 0; } }
 @keyframes pedigree-endpoint-enter { from { opacity: 0; } to { opacity: .9; } }
@@ -1013,6 +1119,7 @@ button:focus-visible, a:focus-visible {
     .family-screen__panel-heading { left: 1.4rem; }
     .constellation__count { display: none; }
     .pedigree-focus { width: min(32rem, calc(100% - 2rem)); min-width: 0; }
+    .timeline__scale-switch button { min-width: 4.2rem; padding-inline: .42rem; }
     .timeline { inset-inline: 1.4rem; }
     .overview { inset-inline: 1.4rem; grid-template-columns: 1.2fr 1fr 1fr; }
     .overview__metric--surnames { display: none; }
@@ -1030,6 +1137,8 @@ button:focus-visible, a:focus-visible {
     .family-screen__exit { padding-inline: .6rem; }
     .family-screen__panel-heading h1 { font-size: 1.05rem; }
     .family-screen__overline, .constellation__legend { display: none; }
+    .family-screen__year-range { display: none; }
+    .timeline__scale-switch { margin-left: auto; }
     .pedigree-focus { right: .5rem; bottom: .5rem; left: .5rem; width: auto; padding: .7rem .75rem; }
     .pedigree-focus dl { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .25rem; }
     .pedigree-focus dl div { padding: .35rem .4rem; }
