@@ -71,7 +71,7 @@ function initializeParentToggle(element) {
 }
 
 function initializeTables() {
-    document.querySelectorAll('table.wt-datatables.d-none').forEach(function (element) {
+    document.querySelectorAll('table.wt-datatables').forEach(function (element) {
         const dataTable = new DataTable(element);
 
         if (element.classList.contains('wt-table-individual') || element.classList.contains('wt-table-family')) {

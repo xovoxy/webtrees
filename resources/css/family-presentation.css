@@ -321,13 +321,30 @@ button:focus-visible, a:focus-visible {
     stroke: rgb(105 185 169 / 12%);
     stroke-dasharray: 3 11;
     stroke-width: 1;
+    transition: stroke 240ms ease, opacity 240ms ease;
 }
 
 .pedigree__generation-label {
     fill: rgb(211 161 102 / 62%);
     font-family: STKaiti, KaiTi, serif;
-    font-size: 14px;
-    letter-spacing: 4px;
+    font-size: 13px;
+    letter-spacing: 2.5px;
+    transition: fill 240ms ease;
+}
+
+.pedigree__generation-caption {
+    fill: rgb(105 185 169 / 36%);
+    font-family: Georgia, serif;
+    font-size: 6.5px;
+    letter-spacing: 1.8px;
+    transition: fill 240ms ease;
+}
+
+.pedigree__guide.is-reference-layer .pedigree__generation-label { fill: #f0c991; }
+.pedigree__guide.is-reference-layer .pedigree__generation-caption { fill: rgb(240 201 145 / 58%); }
+.pedigree__guide.is-reference-layer .pedigree__generation-line {
+    stroke: rgb(211 161 102 / 34%);
+    stroke-dasharray: 1 8;
 }
 
 .constellation__edge {
@@ -460,11 +477,22 @@ button:focus-visible, a:focus-visible {
 }
 
 .constellation__clan-label {
-    fill: rgb(105 185 169 / 72%);
+    fill: rgb(158 220 207 / 86%);
     font-family: STKaiti, KaiTi, serif;
-    font-size: 8px;
-    letter-spacing: 1px;
+    font-size: 7.5px;
+    letter-spacing: .7px;
     text-anchor: end;
+}
+
+.constellation__lineage-chip {
+    fill: rgb(105 185 169 / 8%);
+    stroke: rgb(105 185 169 / 22%);
+    stroke-width: .7;
+}
+
+.constellation__node--root .constellation__lineage-chip {
+    fill: rgb(211 161 102 / 10%);
+    stroke: rgb(211 161 102 / 32%);
 }
 
 .constellation__focus-label {
@@ -557,6 +585,43 @@ button:focus-visible, a:focus-visible {
 .constellation__toolbar button:last-child { border-right: 0; }
 .constellation__toolbar button:hover { color: var(--screen-copper-bright); background: rgb(211 161 102 / 9%); }
 
+.constellation__scale-note {
+    position: absolute;
+    z-index: 4;
+    top: 7.35rem;
+    left: .8rem;
+    display: grid;
+    width: 15rem;
+    padding: .72rem .85rem .76rem;
+    pointer-events: none;
+    border-left: 1px solid rgb(211 161 102 / 55%);
+    background: linear-gradient(90deg, rgb(5 24 22 / 86%), rgb(5 24 22 / 20%), transparent);
+    backdrop-filter: blur(.45rem);
+}
+
+.constellation__scale-note span {
+    color: rgb(211 161 102 / 62%);
+    font-family: Georgia, serif;
+    font-size: .48rem;
+    letter-spacing: .2em;
+}
+
+.constellation__scale-note strong {
+    margin-top: .28rem;
+    color: rgb(244 234 216 / 84%);
+    font-family: "Songti SC", STSong, serif;
+    font-size: .72rem;
+    font-weight: 400;
+    letter-spacing: .08em;
+}
+
+.constellation__scale-note small {
+    margin-top: .22rem;
+    color: rgb(105 185 169 / 54%);
+    font-size: .52rem;
+    letter-spacing: .05em;
+}
+
 .pedigree-tooltip {
     position: absolute;
     z-index: 8;
@@ -589,9 +654,11 @@ button:focus-visible, a:focus-visible {
 .pedigree-tooltip__identity { display: flex; align-items: center; gap: .65rem; margin-top: .65rem; }
 .pedigree-tooltip__identity i { display: grid; width: 2rem; aspect-ratio: 1; place-items: center; color: var(--screen-copper-bright); border: 1px solid rgb(211 161 102 / 38%); border-radius: 50%; font-family: STKaiti, KaiTi, serif; font-style: normal; }
 .pedigree-tooltip__identity strong { font-size: 1rem; font-weight: 500; letter-spacing: .08em; }
+.pedigree-tooltip__lineage,
 .pedigree-tooltip__life,
 .pedigree-tooltip__place,
 .pedigree-tooltip__relations { margin-left: 2.65rem; color: rgb(244 234 216 / 54%); font-size: .6rem; letter-spacing: .05em; line-height: 1.65; }
+.pedigree-tooltip__lineage { margin-top: .28rem; color: var(--screen-copper-bright); }
 .pedigree-tooltip__life { margin-top: .25rem; color: rgb(244 234 216 / 72%); }
 .pedigree-tooltip__relations { margin-top: .25rem; color: var(--screen-jade-bright); }
 

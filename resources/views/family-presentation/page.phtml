@@ -67,6 +67,11 @@ declare(strict_types=1);
                     <button type="button" data-pedigree-action="fit" aria-label="显示完整族谱">全览</button>
                     <button type="button" data-pedigree-action="reset" aria-label="回到核心人物">归位</button>
                 </div>
+                <div class="constellation__scale-note" aria-live="polite">
+                    <span>RELATION SCALE</span>
+                    <strong id="pedigree-scale-reference">以核心人物为关系基准</strong>
+                    <small>纵向表示亲缘层级 · 卡片保留各自家族世代</small>
+                </div>
                 <div class="constellation__legend" aria-hidden="true">
                     <span><i class="constellation__legend-line constellation__legend-line--marriage"></i>婚姻关系</span>
                     <span><i class="constellation__legend-line constellation__legend-line--blood"></i>亲子血缘</span>
@@ -79,6 +84,7 @@ declare(strict_types=1);
                         <i id="pedigree-tooltip-initial">族</i>
                         <strong id="pedigree-tooltip-name">家族成员</strong>
                     </span>
+                    <span class="pedigree-tooltip__lineage" id="pedigree-tooltip-lineage"></span>
                     <span class="pedigree-tooltip__life" id="pedigree-tooltip-life"></span>
                     <span class="pedigree-tooltip__place" id="pedigree-tooltip-place"></span>
                     <span class="pedigree-tooltip__relations" id="pedigree-tooltip-relations"></span>

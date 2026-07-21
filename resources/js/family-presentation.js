@@ -46,6 +46,16 @@ if (dataNode) {
     return surname ? `${shorten(surname, 4)}氏` : '氏族未详';
   };
 
+  const chineseNumber = (value) => {
+    const digits = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+    if (!Number.isInteger(value) || value < 1) return String(value || '');
+    if (value < 10) return digits[value];
+    if (value === 10) return '十';
+    if (value < 20) return `十${digits[value - 10]}`;
+    if (value < 100) return `${digits[Math.floor(value / 10)]}十${value % 10 ? digits[value % 10] : ''}`;
+    return String(value);
+  };
+
   const familyRelationships = () => {
     const relationships = new Map(data.nodes.map((node) => [node.id, {
       parents: new Set(),
@@ -64,6 +74,107 @@ if (dataNode) {
       });
     });
     return relationships;
+  };
+
+  const buildLineageModel = (relationships) => {
+    const nodeById = new Map(data.nodes.map((node) => [node.id, node]));
+    const lineageByNode = new Map();
+    const clans = new Map();
+
+    data.nodes.forEach((node) => {
+      const clan = clanName(node);
+      if (!clans.has(clan)) clans.set(clan, []);
+      clans.get(clan).push(node);
+    });
+
+    clans.forEach((members, clan) => {
+      if (clan === '氏族未详') {
+        members.forEach((node) => lineageByNode.set(node.id, { clan, generation: null, root: node.id }));
+        return;
+      }
+
+      const memberIds = new Set(members.map((node) => node.id));
+      const sameClanParents = new Map(members.map((node) => [
+        node.id,
+        [...(relationships.get(node.id)?.parents || [])].filter((parentId) => memberIds.has(parentId)),
+      ]));
+      const generations = new Map();
+      const branchRoots = new Map();
+      const indegrees = new Map(members.map((node) => [node.id, sameClanParents.get(node.id).length]));
+      const queue = members
+        .filter((node) => indegrees.get(node.id) === 0)
+        .sort((left, right) => (left.birthYear || 9999) - (right.birthYear || 9999));
+
+      queue.forEach((node) => {
+        generations.set(node.id, 1);
+        branchRoots.set(node.id, node.id);
+      });
+
+      while (queue.length > 0) {
+        const current = queue.shift();
+        [...(relationships.get(current.id)?.children || [])]
+          .filter((childId) => memberIds.has(childId))
+          .forEach((childId) => {
+            const nextGeneration = (generations.get(current.id) || 1) + 1;
+            if (nextGeneration > (generations.get(childId) || 0)) {
+              generations.set(childId, nextGeneration);
+              branchRoots.set(childId, branchRoots.get(current.id) || current.id);
+            }
+            indegrees.set(childId, Math.max(0, (indegrees.get(childId) || 0) - 1));
+            if (indegrees.get(childId) === 0) queue.push(nodeById.get(childId));
+          });
+      }
+
+      members.forEach((node) => lineageByNode.set(node.id, {
+        clan,
+        generation: generations.get(node.id) || 1,
+        root: branchRoots.get(node.id) || node.id,
+      }));
+    });
+
+    data.nodes.forEach((node) => {
+      const lineage = lineageByNode.get(node.id);
+      if (!lineage) return;
+      const memberships = new Map();
+      if (lineage.generation) memberships.set(lineage.clan, lineage.generation);
+      [...(relationships.get(node.id)?.parents || [])].forEach((parentId) => {
+        const parentLineage = lineageByNode.get(parentId);
+        if (!parentLineage?.generation || parentLineage.clan === '氏族未详') return;
+        memberships.set(
+          parentLineage.clan,
+          Math.max(memberships.get(parentLineage.clan) || 0, parentLineage.generation + 1),
+        );
+      });
+      lineage.memberships = [...memberships].map(([clan, generation]) => ({ clan, generation }));
+    });
+
+    return lineageByNode;
+  };
+
+  const lineageLabel = (node, lineageByNode) => {
+    const lineage = lineageByNode.get(node.id);
+    if (!lineage || !lineage.generation) return clanName(node);
+    return `${lineage.clan} · ${chineseNumber(lineage.generation)}世`;
+  };
+
+  const lineageDetailLabel = (node, lineageByNode) => {
+    const memberships = lineageByNode.get(node.id)?.memberships || [];
+    if (memberships.length === 0) return lineageLabel(node, lineageByNode);
+    return memberships
+      .slice(0, 3)
+      .map(({ clan, generation }) => `${clan}${chineseNumber(generation)}世`)
+      .join(' · ');
+  };
+
+  const relationshipLayerLabel = (difference) => {
+    if (difference === 0) return '同辈 · 联姻层';
+    if (difference === -1) return '父母辈';
+    if (difference === -2) return '祖父母辈';
+    if (difference === -3) return '曾祖辈';
+    if (difference === 1) return '子女辈';
+    if (difference === 2) return '孙辈';
+    if (difference === 3) return '曾孙辈';
+    return difference < 0 ? `上溯 ${Math.abs(difference)} 代` : `下延 ${difference} 代`;
   };
 
   const pedigreeLayout = () => {
@@ -118,21 +229,48 @@ if (dataNode) {
       });
     });
 
-    const indegrees = new Map([...units.values()].map((unit) => [unit.id, unit.parents.size]));
-    const unitLevels = new Map();
-    const queue = [...units.values()]
-      .filter((unit) => indegrees.get(unit.id) === 0)
-      .sort((left, right) => (left.members[0]?.birthYear || 9999) - (right.members[0]?.birthYear || 9999));
-    queue.forEach((unit) => unitLevels.set(unit.id, 0));
+    // The canvas rank is relationship-based, not a clan's native generation number.
+    // Walking outwards from an anchor keeps every parent exactly one layer above a child,
+    // while the spouse union lets lineages with different recorded depths meet on one row.
+    const unitRanks = new Map();
+    const anchorUnitId = nodeUnit.get(data.tree.root) || units.keys().next().value;
+    const anchorBirthYear = units.get(anchorUnitId)?.members
+      .map((member) => member.birthYear)
+      .filter(Number.isFinite)[0] || null;
+    const walkComponent = (startId, startRank) => {
+      const queue = [startId];
+      unitRanks.set(startId, startRank);
+      while (queue.length > 0) {
+        const unitId = queue.shift();
+        const unit = units.get(unitId);
+        const rank = unitRanks.get(unitId);
+        const neighbours = [
+          ...[...unit.parents].map((id) => ({ id, rank: rank - 1 })),
+          ...[...unit.children].map((id) => ({ id, rank: rank + 1 })),
+        ];
+        neighbours.forEach((neighbour) => {
+          if (unitRanks.has(neighbour.id)) return;
+          unitRanks.set(neighbour.id, neighbour.rank);
+          queue.push(neighbour.id);
+        });
+      }
+    };
 
-    while (queue.length > 0) {
-      const unit = queue.shift();
-      unit.children.forEach((childId) => {
-        unitLevels.set(childId, Math.max(unitLevels.get(childId) || 0, (unitLevels.get(unit.id) || 0) + 1));
-        indegrees.set(childId, indegrees.get(childId) - 1);
-        if (indegrees.get(childId) === 0) queue.push(units.get(childId));
+    walkComponent(anchorUnitId, 0);
+    [...units.values()]
+      .filter((unit) => !unitRanks.has(unit.id))
+      .sort((left, right) => (left.members[0]?.birthYear || 9999) - (right.members[0]?.birthYear || 9999))
+      .forEach((unit) => {
+        if (unitRanks.has(unit.id)) return;
+        const unitBirthYear = unit.members.map((member) => member.birthYear).filter(Number.isFinite)[0] || null;
+        const estimatedRank = anchorBirthYear && unitBirthYear
+          ? Math.round((unitBirthYear - anchorBirthYear) / 28)
+          : 0;
+        walkComponent(unit.id, estimatedRank);
       });
-    }
+
+    const minimumRank = Math.min(0, ...unitRanks.values());
+    const unitLevels = new Map([...unitRanks].map(([unitId, rank]) => [unitId, rank - minimumRank]));
 
     units.forEach((unit) => {
       if (!unitLevels.has(unit.id)) unitLevels.set(unit.id, 0);
@@ -156,9 +294,11 @@ if (dataNode) {
     const familyGroupGap = unitGap + 42;
     const unitWidth = (unit) => unit.members.length * cardWidth + Math.max(0, unit.members.length - 1) * memberGap;
     const unitBirthYear = (unit) => Math.min(...unit.members.map((member) => member.birthYear || 9999));
+    const levelPositions = new Map();
     const placeUnit = (unit, left, level) => {
       const width = unitWidth(unit);
-      const y = 115 + level * rowGap;
+      const y = 135 + level * rowGap;
+      levelPositions.set(level, y);
       unitPositions.set(unit.id, { x: left + width / 2, y, width, level });
       unit.members.forEach((node, memberIndex) => {
         nodePositions.set(node.id, {
@@ -301,11 +441,15 @@ if (dataNode) {
     const contentWidth = maxRight - minLeft + horizontalPadding * 2;
 
     return {
+      anchorLevel: unitLevels.get(anchorUnitId) || 0,
       cardHeight,
       cardWidth,
-      contentHeight: 190 + Math.max(0, ...sortedLevels) * rowGap,
+      contentHeight: 225 + Math.max(0, ...sortedLevels) * rowGap,
       contentWidth,
+      levelPositions,
+      nodeLevels: new Map(data.nodes.map((node) => [node.id, unitLevels.get(nodeUnit.get(node.id)) || 0])),
       nodePositions,
+      nodeRanks: new Map(data.nodes.map((node) => [node.id, unitRanks.get(nodeUnit.get(node.id)) || 0])),
       rows,
       sortedLevels,
       unitPositions,
@@ -315,15 +459,18 @@ if (dataNode) {
   const renderConstellation = () => {
     const svg = document.getElementById('constellation-map');
     if (!svg || data.nodes.length === 0) return;
-    const layout = pedigreeLayout();
     const relationships = familyRelationships();
+    const lineageByNode = buildLineageModel(relationships);
+    const layout = pedigreeLayout();
     const nodeById = new Map(data.nodes.map((node) => [node.id, node]));
     const nodeGroups = new Map();
     const focusLabels = new Map();
     const familyGroups = new Map();
     const familyGeometry = new Map();
+    const guideGroups = new Map();
     const tooltip = document.getElementById('pedigree-tooltip');
     const focusPanel = document.getElementById('pedigree-focus');
+    const scaleReference = document.getElementById('pedigree-scale-reference');
     let focusedId = null;
 
     const defs = svgElement('defs');
@@ -342,16 +489,33 @@ if (dataNode) {
     const viewport = svgElement('g', { class: 'pedigree__viewport' });
     const guideLayer = svgElement('g', { class: 'pedigree__guides' });
     layout.sortedLevels.forEach((level) => {
-      const y = 50 + level * 190;
+      const y = layout.levelPositions.get(level) - 58;
+      const guide = svgElement('g', { class: 'pedigree__guide', 'data-level': String(level) });
       const label = svgElement('text', { class: 'pedigree__generation-label', x: '32', y: String(y) });
-      label.textContent = `第 ${['一', '二', '三', '四', '五', '六', '七', '八'][level] || level + 1} 世`;
-      guideLayer.append(label);
-      guideLayer.append(svgElement('line', {
+      const caption = svgElement('text', { class: 'pedigree__generation-caption', x: '32', y: String(y + 17) });
+      const line = svgElement('line', {
         class: 'pedigree__generation-line',
-        x1: '105', y1: String(y - 4), x2: String(layout.contentWidth - 30), y2: String(y - 4),
-      }));
+        x1: '156', y1: String(y - 4), x2: String(layout.contentWidth - 30), y2: String(y - 4),
+      });
+      guide.append(label, caption, line);
+      guideLayer.append(guide);
+      guideGroups.set(level, { caption, guide, label });
     });
     viewport.append(guideLayer);
+
+    const updateGuideLabels = (referenceId) => {
+      const reference = nodeById.get(referenceId) || nodeById.get(data.tree.root) || data.nodes[0];
+      const referenceLevel = layout.nodeLevels.get(reference?.id) ?? layout.anchorLevel;
+      guideGroups.forEach(({ caption, guide, label }, level) => {
+        const difference = level - referenceLevel;
+        label.textContent = relationshipLayerLabel(difference);
+        caption.textContent = difference === 0 ? 'RELATION ORIGIN' : `RELATION ${difference > 0 ? '+' : ''}${difference}`;
+        guide.classList.toggle('is-reference-layer', difference === 0);
+      });
+      if (scaleReference && reference) scaleReference.textContent = `以 ${reference.name} 为关系基准`;
+    };
+
+    updateGuideLabels(data.tree.root);
 
     const edgeLayer = svgElement('g', { class: 'pedigree__connections' });
     const appendBloodline = (group, d, type) => {
@@ -470,7 +634,8 @@ if (dataNode) {
       if (relation?.children.size) relationParts.push(`子女 ${relation.children.size}`);
       document.getElementById('pedigree-tooltip-initial').textContent = Array.from(node.name || '族')[0];
       document.getElementById('pedigree-tooltip-name').textContent = node.name;
-      document.getElementById('pedigree-tooltip-life').textContent = `${clanName(node)} · ${plainYear(node)} · ${node.living ? '在世' : '已故'}`;
+      document.getElementById('pedigree-tooltip-lineage').textContent = `家族世代 · ${lineageDetailLabel(node, lineageByNode)}`;
+      document.getElementById('pedigree-tooltip-life').textContent = `${plainYear(node)} · ${node.living ? '在世' : '已故'}`;
       document.getElementById('pedigree-tooltip-place').textContent = node.birthPlace ? `出生地 · ${node.birthPlace}` : '出生地暂未记录';
       document.getElementById('pedigree-tooltip-relations').textContent = relationParts.join(' · ') || '家庭关系暂未记录';
       const canvasRect = svg.parentElement.getBoundingClientRect();
@@ -488,6 +653,8 @@ if (dataNode) {
       const position = layout.nodePositions.get(node.id);
       if (!position) return;
       const root = node.isRoot;
+      const nodeLineage = lineageByNode.get(node.id);
+      const nodeLineageLabel = lineageLabel(node, lineageByNode);
       const group = svgElement('g', {
         class: `constellation__node constellation__node--${node.sex === 'F' ? 'female' : 'male'}${root ? ' constellation__node--root' : ''}`,
         transform: `translate(${position.x} ${position.y})`,
@@ -495,7 +662,8 @@ if (dataNode) {
         tabindex: '0',
         role: 'button',
         'aria-pressed': 'false',
-        'aria-label': `${node.name}，${clanName(node)}，${plainYear(node)}，点击聚焦直系亲属`,
+        'aria-label': `${node.name}，${nodeLineageLabel}，${plainYear(node)}，点击聚焦直系亲属`,
+        'data-lineage-root': nodeLineage?.root || node.id,
         'data-node-id': node.id,
       });
       group.append(svgElement('rect', {
@@ -515,11 +683,12 @@ if (dataNode) {
       name.textContent = shorten(node.name, 10);
       const years = svgElement('text', { class: 'constellation__node-years', x: '-31', y: '13' });
       years.textContent = plainYear(node);
+      const lineageChip = svgElement('rect', { class: 'constellation__lineage-chip', x: '9', y: '17', width: '72', height: '17', rx: '8.5' });
       const clan = svgElement('text', { class: 'constellation__clan-label', x: '76', y: '29' });
-      clan.textContent = clanName(node);
+      clan.textContent = nodeLineageLabel;
       const focusLabel = svgElement('text', { class: 'constellation__focus-label', x: '76', y: '-26' });
-      focusLabel.textContent = root ? '本族核心' : '';
-      group.append(initial, name, years, clan, focusLabel);
+      focusLabel.textContent = root ? '画布基准' : '';
+      group.append(initial, name, years, lineageChip, clan, focusLabel);
       nodeLayer.append(group);
       nodeGroups.set(node.id, group);
       focusLabels.set(node.id, focusLabel);
@@ -563,7 +732,7 @@ if (dataNode) {
       if (!focusPanel) return;
       focusPanel.hidden = false;
       document.getElementById('pedigree-focus-name').textContent = node.name;
-      document.getElementById('pedigree-focus-clan').textContent = clanName(node);
+      document.getElementById('pedigree-focus-clan').textContent = `${lineageLabel(node, lineageByNode)} · 当前关系原点`;
       document.getElementById('pedigree-focus-parents').textContent = relationNames(relation.parents);
       document.getElementById('pedigree-focus-spouses').textContent = relationNames(relation.spouses);
       document.getElementById('pedigree-focus-children').textContent = relationNames(relation.children);
@@ -655,10 +824,11 @@ if (dataNode) {
       nodeGroups.forEach((group, id) => {
         group.classList.remove('is-selected-person', 'is-direct-relative', 'is-collateral-relative', 'is-dimmed');
         group.setAttribute('aria-pressed', 'false');
-        focusLabels.get(id).textContent = nodeById.get(id)?.isRoot ? '本族核心' : '';
+        focusLabels.get(id).textContent = nodeById.get(id)?.isRoot ? '画布基准' : '';
       });
       familyGroups.forEach(({ group }) => group.classList.remove('is-active-family', 'is-dimmed-family'));
       if (focusPanel) focusPanel.hidden = true;
+      updateGuideLabels(data.tree.root);
     };
 
     const focusPerson = (id) => {
@@ -703,6 +873,7 @@ if (dataNode) {
         group.classList.toggle('is-active-family', active);
         group.classList.toggle('is-dimmed-family', !active);
       });
+      updateGuideLabels(id);
       renderFocusRays(id);
       updateFocusPanel(node, relation, siblings);
       tooltip?.classList.remove('is-visible');
