@@ -53,9 +53,26 @@ use Fisharebest\Webtrees\Site;
         <div class="col-sm-9">
             <?= view('components/radios-inline', ['name' => 'USE_REGISTRATION_MODULE', 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => (int) Site::getPreference('USE_REGISTRATION_MODULE')]) ?>
             <div class="form-text">
-                <?= I18N::translate('The new user will be asked to confirm their email address before the account is created.') ?>
+                <?php if (Site::getPreference('REQUIRE_EMAIL_VERIFICATION') === '1') : ?>
+                    <?= I18N::translate('The new user will be asked to confirm their email address before the account is created.') ?>
+                <?php else : ?>
+                    <?= I18N::translate('New registrations are considered email verified automatically.') ?>
+                <?php endif ?>
                 <?= I18N::translate('Details of the new user will be sent to the genealogy contact for the corresponding family tree.') ?>
                 <?= I18N::translate('An administrator must approve the new user account and select an access level before the user can sign in.') ?>
+            </div>
+        </div>
+    </fieldset>
+
+    <!-- REQUIRE_EMAIL_VERIFICATION -->
+    <fieldset class="row mb-3">
+        <legend class="col-form-label col-sm-3">
+            <?= /* I18N: A configuration setting */ I18N::translate('Require email verification for new users') ?>
+        </legend>
+        <div class="col-sm-9">
+            <?= view('components/radios-inline', ['name' => 'REQUIRE_EMAIL_VERIFICATION', 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => (int) Site::getPreference('REQUIRE_EMAIL_VERIFICATION')]) ?>
+            <div class="form-text">
+                <?= I18N::translate('When disabled, new registrations are considered email verified automatically. An administrator must still approve the account before the user can sign in.') ?>
             </div>
         </div>
     </fieldset>

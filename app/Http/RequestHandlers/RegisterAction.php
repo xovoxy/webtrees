@@ -107,12 +107,13 @@ final class RegisterAction implements RequestHandlerInterface
 
         Log::addAuthenticationLog('User registration requested for: ' . $username);
 
-        $user  = $this->user_service->create($username, $realname, $email, $password);
-        $token = Str::random(32);
+        $user                         = $this->user_service->create($username, $realname, $email, $password);
+        $require_email_verification = Site::getPreference('REQUIRE_EMAIL_VERIFICATION') === '1';
+        $token                       = $require_email_verification ? Str::random(32) : '';
 
         $user->setPreference(UserInterface::PREF_LANGUAGE, I18N::languageTag());
         $user->setPreference(UserInterface::PREF_TIME_ZONE, Site::getPreference('TIMEZONE'));
-        $user->setPreference(UserInterface::PREF_IS_EMAIL_VERIFIED, '');
+        $user->setPreference(UserInterface::PREF_IS_EMAIL_VERIFIED, $require_email_verification ? '' : '1');
         $user->setPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED, '');
         $user->setPreference(UserInterface::PREF_TIMESTAMP_REGISTERED, date('U'));
         $user->setPreference(UserInterface::PREF_VERIFICATION_TOKEN, $token);
@@ -124,24 +125,27 @@ final class RegisterAction implements RequestHandlerInterface
         $user->setPreference(UserInterface::PREF_TIMESTAMP_ACTIVE, '0');
 
         $base_url = Validator::attributes($request)->string('base_url');
-        $reply_to = $tree instanceof Tree ? new TreeUser($tree) : new SiteUser();
 
-        $verify_url = route(VerifyEmail::class, [
-            'username' => $user->userName(),
-            'token'    => $token,
-            'tree'     => $tree?->name(),
-        ]);
+        if ($require_email_verification) {
+            $reply_to = $tree instanceof Tree ? new TreeUser($tree) : new SiteUser();
 
-        // Send a verification message to the user.
-        /* I18N: %s is a server name/URL */
-        $this->email_service->send(
-            new SiteUser(),
-            $user,
-            $reply_to,
-            I18N::translate('Your registration at %s', $base_url),
-            view('emails/register-user-text', ['user' => $user, 'base_url' => $base_url, 'verify_url' => $verify_url]),
-            view('emails/register-user-html', ['user' => $user, 'base_url' => $base_url, 'verify_url' => $verify_url])
-        );
+            $verify_url = route(VerifyEmail::class, [
+                'username' => $user->userName(),
+                'token'    => $token,
+                'tree'     => $tree?->name(),
+            ]);
+
+            // Send a verification message to the user.
+            /* I18N: %s is a server name/URL */
+            $this->email_service->send(
+                new SiteUser(),
+                $user,
+                $reply_to,
+                I18N::translate('Your registration at %s', $base_url),
+                view('emails/register-user-text', ['user' => $user, 'base_url' => $base_url, 'verify_url' => $verify_url]),
+                view('emails/register-user-html', ['user' => $user, 'base_url' => $base_url, 'verify_url' => $verify_url])
+            );
+        }
 
         // Tell the administrators about the registration.
         foreach ($this->user_service->administrators() as $administrator) {
@@ -196,6 +200,7 @@ final class RegisterAction implements RequestHandlerInterface
             'title' => $title,
             'tree'  => $tree,
             'user'  => $user,
+            'require_email_verification' => $require_email_verification,
         ]);
     }
 

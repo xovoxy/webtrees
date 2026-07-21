@@ -93,7 +93,8 @@ class Site
         'SMTP_SSL'                => 'none',
         'THEME_DIR'               => 'webtrees',
         'TIMEZONE'                => 'UTC',
-        'USE_REGISTRATION_MODULE' => '1',
+        'REQUIRE_EMAIL_VERIFICATION' => '0',
+        'USE_REGISTRATION_MODULE'    => '1',
     ];
 
     /**
