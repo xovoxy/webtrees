@@ -1987,14 +1987,13 @@ a > .wt-icon-arrow-up:hover {
     }
 
     .wt-primary-navigation {
-        overflow-x: auto;
-        scrollbar-width: thin;
+        overflow: visible;
     }
 
     .wt-genealogy-menu {
-        flex-wrap: nowrap;
-        width: max-content;
-        min-width: 100%;
+        flex-wrap: wrap;
+        width: 100%;
+        min-width: 0;
     }
 }
 
@@ -2028,12 +2027,12 @@ a > .wt-icon-arrow-up:hover {
 
     .wt-secondary-navigation {
         order: 4;
-        overflow-x: auto;
+        overflow: visible;
     }
 
     .wt-user-menu {
-        flex-wrap: nowrap;
-        width: max-content;
+        flex-wrap: wrap;
+        width: 100%;
     }
 
     .wt-main-container {
